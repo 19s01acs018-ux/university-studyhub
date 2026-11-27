@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>University StudyHub – Complete LMS Prototype</title>
+<style>
+:root{--bg:#f7f4f4;--card:#fff;--ink:#241a1a;--mut:#6b5d5d;--pri:#a81c1c;--tint:#fbeaea;--line:#e6dcdc;--ok:#2e7d32;--warn:#b26a00;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#150f0f;--card:#211817;--ink:#f3eae9;--mut:#b9a9a7;--pri:#c93a3a;--tint:#2e1a1a;--line:#3a2b2a;--ok:#66bb6a;--warn:#ffb74d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#150f0f;--card:#211817;--ink:#f3eae9;--mut:#b9a9a7;--pri:#c93a3a;--tint:#2e1a1a;--line:#3a2b2a;--ok:#66bb6a;--warn:#ffb74d;color-scheme:dark}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--pri);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:12;background:var(--pri);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px}
+header .sp{flex:1;min-width:12px}
+header input.gsearch{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35);min-height:36px;padding:4px 12px;border-radius:99px;width:230px;font-size:13px}
+header input.gsearch::placeholder{color:rgba(255,255,255,.8)}
+header button{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35);min-height:36px;padding:5px 11px;font-size:13px;position:relative}
+header button:hover{background:rgba(255,255,255,.26)}
+.badge{position:absolute;top:-5px;right:-5px;background:#fff;color:var(--pri);font-size:11px;font-weight:700;padding:1px 5px;border-radius:99px}
+.pop{position:fixed;top:58px;right:16px;width:min(380px,calc(100vw - 32px));max-height:75vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.22);padding:14px;z-index:25}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:14px;max-width:760px;width:100%;max-height:88vh;overflow-y:auto;padding:18px}
+.app{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 56px)}
+nav{background:var(--card);border-right:1px solid var(--line);padding:12px 8px}
+nav a{display:block;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--ink);margin-bottom:2px;font-size:14px}
+nav a.on{background:var(--tint);color:var(--pri);font-weight:600}
+main{padding:20px;max-width:980px;width:100%}
+h2{margin:0 0 4px;font-size:22px}.obj{display:inline-block;font-size:12px;background:var(--tint);color:var(--pri);padding:2px 8px;border-radius:99px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.alert{background:var(--tint);border:1px solid var(--pri);border-radius:12px;padding:12px 14px;margin-bottom:12px;color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}.grid .card{margin:0}
+.unit{cursor:pointer}.unit:hover,.unit.sel{border-color:var(--pri);background:var(--tint)}
+.unit b{font-size:16px}.tiles b{font-size:22px;color:var(--pri)}
+.stat b{display:block;font-size:24px;color:var(--pri)}
+button{background:var(--pri);color:#fff;border:0;border-radius:8px;padding:10px 16px;font:inherit;cursor:pointer;min-height:42px}
+button.ghost{background:var(--tint);color:var(--pri)}
+button.sm{padding:6px 12px;min-height:34px;font-size:13px}
+button.pill{border-radius:99px;padding:6px 14px;min-height:34px;font-size:13px}
+input,select,textarea{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);min-height:42px;max-width:100%}
+input[type="file"]{padding:6px;font-size:13px}
+input[type="range"]{padding:0;min-height:24px;accent-color:var(--pri)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--tint);color:var(--pri);display:inline-flex;align-items:center;gap:6px}
+.tag button{background:none;color:var(--pri);padding:0 2px;min-height:0;font-weight:700;line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.hi{color:var(--pri);font-weight:600}.med{color:var(--warn);font-weight:600}.lo{color:var(--ok);font-weight:600}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pri)}
+.bar.sm{height:6px;width:110px;display:inline-block;vertical-align:middle;margin-right:6px}
+.funnel-row{display:grid;grid-template-columns:150px 1fr 150px;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.funnel-row:last-child{border:0}
+.week-banner{display:flex;align-items:center;justify-content:space-between;background:var(--tint);border-left:4px solid var(--pri);padding:8px 12px;border-radius:8px;margin:16px 0 8px}
+.topic-box{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--card)}
+.topic-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
+.topic-col{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px}
+.topic-col h5{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--pri);display:flex;justify-content:space-between;align-items:center}
+.mini-item{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.mini-item:last-child{border:0}
+table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tt-table th,.tt-table td{white-space:normal;vertical-align:top;min-width:132px;border-right:1px solid var(--line)}
+.tt-table th:first-child,.tt-table td:first-child{min-width:125px;background:var(--bg);font-weight:600;position:sticky;left:0;z-index:2}
+.tt-table th:last-child,.tt-table td:last-child{border-right:0}
+.tt-slot{background:var(--bg);border:1px solid var(--line);border-left:3px solid var(--pri);border-radius:8px;padding:7px 8px;margin-bottom:6px;font-size:12.5px;line-height:1.35}
+.tt-slot:last-child{margin-bottom:0}
+.tt-slot.quiz{border-left-color:var(--warn)}
+.tt-slot.study{border-left-color:var(--ok)}
+.item{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}.done{text-decoration:line-through;color:var(--mut)}
+.fb{background:var(--bg);border-left:3px solid var(--pri);padding:8px 10px;border-radius:6px;margin-top:6px;font-size:13px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);margin-bottom:8px}
+.opt:hover{border-color:var(--pri);background:var(--tint)}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;padding:4px 10px;border-radius:8px;background:var(--tint);color:var(--pri)}
+.timer.urgent{background:var(--pri);color:#fff}
+.flashcard{min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;border:2px solid var(--pri);border-radius:14px;background:var(--tint);cursor:pointer;margin:12px 0;transition:transform .15s}
+.flashcard:hover{transform:translateY(-2px)}
+.pomo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:var(--tint);border:1px solid var(--pri);border-radius:12px;padding:14px;margin-bottom:12px}
+.pomo-clock{font-size:32px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--pri)}
+.report-sheet{background:var(--card);border:2px solid var(--pri);border-radius:14px;padding:22px;margin-top:12px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.report-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:2px solid var(--pri);padding-bottom:12px;margin-bottom:16px}
+.report-sec{margin-top:18px}
+.report-sec h4{margin:0 0 8px;color:var(--pri);font-size:15px;text-transform:uppercase;letter-spacing:.4px}
+.auth{max-width:420px;margin:0 auto;padding:28px 16px}.auth .logo{text-align:center;font-size:44px}.auth h1{text-align:center;margin:4px 0 2px;font-size:24px}
+.tabs{display:flex;gap:8px;margin:16px 0}.tabs button{flex:1}.fld{display:block;margin-bottom:10px}.fld span{display:block;font-size:13px;color:var(--mut);margin-bottom:3px}.fld input,.fld select{width:100%}
+.err{color:var(--pri);font-size:13px;min-height:18px;margin-bottom:8px}.link{color:var(--pri);background:none;border:0;padding:0;min-height:0;font-size:13px;text-decoration:underline}
+.demo{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.demo button{padding:6px 10px;min-height:36px;font-size:13px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;display:none;z-index:40}
+small{color:var(--mut)}
+@media(max-width:700px){.app{grid-template-columns:1fr}nav{display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);position:sticky;top:calc(52px + env(safe-area-inset-top,0px));z-index:8}nav a{white-space:nowrap;margin:0 4px 0 0}main{padding:14px}header input.gsearch{width:100%;order:10}.funnel-row{grid-template-columns:1fr}}
+@media print{
+  body{background:#fff !important;color:#000 !important}
+  body::before,header,nav,.no-print,#toast,.pop,.modal-bg,main > p:last-child{display:none !important}
+  .app{display:block !important}
+  main{max-width:100% !important;padding:0 !important}
+  .report-sheet{border:1px solid #999 !important;box-shadow:none !important;padding:12px !important;margin:0 !important}
+  .card{border:1px solid #ccc !important;break-inside:avoid}
+  table{display:table !important;width:100% !important}
+  th,td{white-space:normal !important;font-size:12px !important;padding:6px !important}
+}
+</style></head>
+<body><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),D=n=>{const d=new Date();d.setDate(d.getDate()+n);return d},fd=d=>d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const toast=m=>{const t=$("#toast");if(!t)return;t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",2600)};
+const fmtSec=s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+const STORAGE_KEY="studyhub_lms_v11";
+const RES_CATS=["Slides","Notes","Books","Past Papers","Other"];
+const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const FILE_BLOBS={};
+
+const DEFAULT_DATA=()=>({
+  role:"Student",view:"dash",user:null,mode:"login",err:"",theme:"auto",
+  unit:null,tab:"modules",resCat:"All",topicFilter:"All",weekFilter:"All",
+  qi:null,ot:null,gradeAsg:null,
+  fcIdx:0,fcFlip:false,fcFilter:"all",
+  search:"",showNotifs:false,preview:null,
+  repPreview:true,
+  simMarks:{},qDraft:[],
+  acc:[
+    {e:"student@university.ac.ke",p:"student123",n:"Tonny Ariwi",r:"Student",year:3,lastLoginDays:0,feeStatus:"Cleared"},
+    {e:"brian@university.ac.ke",p:"student123",n:"Brian Otieno",r:"Student",year:3,lastLoginDays:2,feeStatus:"Cleared"},
+    {e:"faith@university.ac.ke",p:"student123",n:"Faith Njeri",r:"Student",year:3,lastLoginDays:16,feeStatus:"Fee Balance Hold"},
+    {e:"kevin@university.ac.ke",p:"student123",n:"Kevin Mutua",r:"Student",year:3,lastLoginDays:19,feeStatus:"Cleared"},
+    {e:"instructor@university.ac.ke",p:"instructor123",n:"Grace Mwangi",r:"Instructor",lastLoginDays:1},
+    {e:"david@university.ac.ke",p:"instructor123",n:"Dr. David Kamau",r:"Instructor",lastLoginDays:3},
+    {e:"sarah@university.ac.ke",p:"instructor123",n:"Prof. Sarah Omondi",r:"Instructor",lastLoginDays:18},
+    {e:"admin@university.ac.ke",p:"admin123",n:"Admin Office",r:"Administrator",lastLoginDays:0}
+  ],
+  units:[
+    {code:"CSC 311",name:"Database Systems",ins:"Grace Mwangi",students:["Tonny Ariwi","Brian Otieno","Faith Njeri","Kevin Mutua"]},
+    {code:"CSC 325",name:"Software Engineering",ins:"Grace Mwangi",students:["Tonny Ariwi","Faith Njeri","Kevin Mutua"]},
+    {code:"CSC 429",name:"Computer Project",ins:"Dr. David Kamau",students:["Tonny Ariwi","Brian Otieno"]},
+    {code:"CSC 214",name:"Data Structures & Algorithms",ins:"Prof. Sarah Omondi",students:["Brian Otieno","Faith Njeri","Kevin Mutua"]}
+  ],
+  topics:[
+    {id:"t_db1",c:0,week:1,title:"Foundations of Relational Databases",summary:"DBMS architecture, data independence, keys, and core textbook setup."},
+    {id:"t_db2",c:0,week:2,title:"Entity-Relationship (ER) Modelling",summary:"Entities, attributes, cardinality ratios (1:1, 1:N, M:N), and weak entities."},
+    {id:"t_db3",c:0,week:3,title:"Relational Normalisation (1NF–BCNF)",summary:"Functional dependencies, partial/transitive dependency elimination, and decomposition."},
+    {id:"t_db4",c:0,week:4,title:"SQL Querying & Exam Revision",summary:"DDL/DML lab setup and CAT/Final past paper walkthroughs."},
+    {id:"t_se1",c:1,week:1,title:"Software Process Models",summary:"Waterfall, incremental delivery, and core software engineering principles."},
+    {id:"t_se2",c:1,week:2,title:"Agile & Scrum Delivery",summary:"Sprints, user stories, product backlogs, and velocity tracking."},
+    {id:"t_se3",c:1,week:3,title:"Requirements Engineering & SRS",summary:"Functional vs. non-functional requirements and IEEE 830 specification."},
+    {id:"t_se4",c:1,week:4,title:"UML System Modelling",summary:"Use case, class, and sequence diagrams for object-oriented design."},
+    {id:"t_pr1",c:2,week:1,title:"Problem Formulation & Proposal Structure",summary:"Topic selection, research objectives, and Chapter 1–3 formatting."},
+    {id:"t_pr2",c:2,week:2,title:"Research Methodology & Ethics",summary:"Sampling techniques, questionnaires, and ethical clearance protocols."}
+  ],
+  cohorts:[
+    {year:"Year 1 (Freshmen)",enrolled:320,retained:288,transfersOut:14,dropouts:18,gpa:64},
+    {year:"Year 2 (Sophomores)",enrolled:288,retained:242,transfersOut:19,dropouts:27,gpa:61},
+    {year:"Year 3 (Juniors)",enrolled:242,retained:224,transfersOut:8,dropouts:10,gpa:66},
+    {year:"Year 4 (Finalists)",enrolled:224,retained:215,transfersOut:2,dropouts:7,gpa:69}
+  ],
+  integrityFlags:[
+    {id:"INT-104",student:"Kevin Mutua",unit:"CSC 325",type:"Plagiarism Similarity (68%)",detail:"SRS Section 2 matched external repository & peer draft.",severity:"High",status:"Under Review",date:"2 days ago"},
+    {id:"INT-103",student:"Faith Njeri",unit:"CSC 311",type:"Quiz Speed Anomaly",detail:"Completed Normalisation Quiz in 11 seconds (avg: 3m 40s).",severity:"Medium",status:"Flagged",date:"4 days ago"},
+    {id:"INT-102",student:"Brian Otieno",unit:"CSC 311",type:"Duplicate SQL Script Header",detail:"Shared lab boilerplate comment block; verified benign.",severity:"Low",status:"Cleared",date:"1 week ago"}
+  ],
+  timetable:[
+    {c:0,day:"Mon",time:"08:00 – 10:00",hrs:2,venue:"Science Complex LT 2",type:"Lecture"},
+    {c:1,day:"Tue",time:"10:00 – 12:00",hrs:2,venue:"ICT Lab 3",type:"Practical Lab"},
+    {c:0,day:"Wed",time:"14:00 – 16:00",hrs:2,venue:"Database Lab B",type:"Practical Lab"},
+    {c:2,day:"Thu",time:"11:00 – 13:00",hrs:2,venue:"Seminar Room 4",type:"Supervision"},
+    {c:1,day:"Fri",time:"09:00 – 11:00",hrs:2,venue:"Main Auditorium",type:"Lecture"}
+  ],
+  res:[
+    {t:"Week 1 Slides – Relational Database Architecture",c:0,topicId:"t_db1",k:"Slides",x:"Lecture Deck",views:18,file:"csc311_week1_intro.pdf",summary:"Introduces database schemas, keys, relational algebra, and DBMS tiers."},
+    {t:"Database System Concepts (Silberschatz, 7th Ed.)",c:0,topicId:"t_db1",k:"Books",x:"Core Textbook",views:14,file:"silberschatz_db_7e.pdf",summary:"Covers relational algebra, SQL, ER modelling, functional dependencies, 1NF–BCNF normalisation, and transaction concurrency."},
+    {t:"Week 2 Slides – Entity-Relationship Modelling",c:0,topicId:"t_db2",k:"Slides",x:"Lecture Deck",views:16,file:"csc311_week2_erd.pdf",summary:"Visual walkthrough of Chen and Crow's Foot ER notation."},
+    {t:"ER Modelling Lecture Notes",c:0,topicId:"t_db2",k:"Notes",x:"Study Notes",views:12,file:"er_modelling_notes.pdf",summary:"Notation rules for strong/weak entities, cardinality ratios (1:1, 1:N, M:N), and participation constraints."},
+    {t:"Week 3 Slides – Normalisation (1NF to BCNF)",c:0,topicId:"t_db3",k:"Slides",x:"Lecture Deck",views:19,file:"csc311_week3_normalisation.pdf",summary:"Step-by-step decomposition examples from unnormalised tables to 3NF and Boyce-Codd Normal Form."},
+    {t:"CAT 1 Past Paper (2024)",c:0,topicId:"t_db4",k:"Past Papers",x:"2024 Semester 1",views:22,file:"csc311_cat1_2024.pdf",summary:"4 structured questions covering SQL DDL/DML queries, relational schema mapping, and 2NF/3NF proofs."},
+    {t:"Final Exam Past Paper (2023)",c:0,topicId:"t_db4",k:"Past Papers",x:"2023 Main Exam",views:17,file:"csc311_exam_2023.pdf",summary:"Section A (compulsory 30 marks) + Section B (choose 2 of 4 questions, 20 marks each)."},
+    {t:"PostgreSQL Lab Setup & Sample Schema",c:0,topicId:"t_db4",k:"Other",x:"Lab Guide",views:6,file:"postgres_setup.sql",summary:"Installation instructions and university_db SQL seed script for Lab 2."},
+    {t:"Software Engineering (Ian Sommerville, 10th Ed.)",c:1,topicId:"t_se1",k:"Books",x:"Core Textbook",views:11,file:"sommerville_se_10e.pdf",summary:"Software processes, agile development, requirements engineering, system modeling (UML), and software testing."},
+    {t:"Week 1 Slides – SDLC & Process Models",c:1,topicId:"t_se1",k:"Slides",x:"Lecture Deck",views:14,file:"csc325_week1_sdlc.pdf",summary:"Compares Waterfall, V-Model, Spiral, and Incremental prototyping."},
+    {t:"Agile & Scrum Lecture Slides",c:1,topicId:"t_se2",k:"Slides",x:"Lecture Deck",views:9,file:"csc325_agile_scrum.pdf",summary:"Product backlogs, sprint planning, daily standups, velocity tracking, and retrospectives."},
+    {t:"SRS IEEE 830 Template",c:1,topicId:"t_se3",k:"Other",x:"Template",views:13,file:"ieee_830_srs_template.docx",summary:"Standardized Software Requirements Specification template for Assignment 2."},
+    {t:"Week 4 Slides – UML Use Case & Class Diagrams",c:1,topicId:"t_se4",k:"Slides",x:"Lecture Deck",views:17,file:"csc325_week4_uml.pdf",summary:"Modeling system actors, use cases, and structural class hierarchies."},
+    {t:"UML Class & Use Case Notes",c:1,topicId:"t_se4",k:"Notes",x:"Study Notes",views:15,file:"uml_diagrams_notes.pdf",summary:"Association, aggregation, composition, generalization, and include/extend relationships in UML 2.5."},
+    {t:"End-of-Semester Exam (2023)",c:1,topicId:"t_se4",k:"Past Papers",x:"2023",views:16,file:"csc325_exam_2023.pdf",summary:"Case-study based exam focusing on SRS specification, UML sequence diagrams, and black-box testing."},
+    {t:"Project Proposal Guidelines",c:2,topicId:"t_pr1",k:"Notes",x:"Guide",views:12,file:"csc429_proposal_guide.pdf",summary:"Formatting rules, Chapter 1–3 structure, Gantt chart expectations, and supervisor sign-off rubric."},
+    {t:"Defense Presentation Slides Template",c:2,topicId:"t_pr1",k:"Slides",x:"Template",views:5,file:"project_defense_deck.pptx",summary:"12-slide structure for final year project proposal and system demo defense."},
+    {t:"Research Methods in Computing",c:2,topicId:"t_pr2",k:"Books",x:"Reference Book",views:8,file:"research_methods_computing.pdf",summary:"Problem formulation, literature review synthesis, sampling techniques, and ethical clearance."},
+    {t:"Ethics Clearance Form",c:2,topicId:"t_pr2",k:"Other",x:"Form",views:4,file:"ethics_clearance_form.pdf",summary:"Required participant consent and data privacy declaration before collecting survey data."}
+  ],
+  tasks:[
+    {t:"Database assignment 2",c:0,d:3,w:15,h:4,logged:{},done:0,a:1,subs:{
+      "Brian Otieno":{file:"brian_erd_v2.pdf",mark:null,fb:"",status:"Submitted",note:"ER diagram and 3NF relational schema attached."},
+      "Faith Njeri":{file:"faith_db_design.pdf",mark:78,fb:"Good 3NF decomposition; check cardinalities.",status:"Draft",note:"Complete normalization tables and SQL script."}
+    }},
+    {t:"SRS document draft",c:1,d:5,w:20,h:6,logged:{"Tonny Ariwi":2},done:0,a:1,subs:{
+      "Kevin Mutua":{file:"srs_draft_kevin.docx",mark:null,fb:"",status:"Submitted",note:"Draft sections 1 to 3 with Use Case diagrams."}
+    }},
+    {t:"Chapter 3 proposal",c:2,d:6,w:10,h:5,logged:{},done:0,a:1,subs:{}},
+    {t:"CAT 2 revision",c:0,d:6,w:20,h:6,logged:{"Tonny Ariwi":1},done:0},
+    {t:"Reading: UML chapter",c:1,d:2,w:5,h:2,logged:{"Tonny Ariwi":2},done:1,m:80},
+    {t:"Assignment 1",c:0,d:-7,w:10,h:3,logged:{"Tonny Ariwi":3},done:1,m:72,a:1,subs:{
+      "Tonny Ariwi":{file:"assignment1.pdf",mark:72,fb:"Solid ER diagram; missing weak entity notation.",status:"Released",note:"Hospital management system ER diagram."},
+      "Brian Otieno":{file:"brian_asg1.pdf",mark:65,fb:"Complete all attributes on the schema.",status:"Released",note:"Library schema draft."},
+      "Faith Njeri":{file:"faith_asg1.pdf",mark:84,fb:"Excellent normalisation proof.",status:"Released",note:"Full relational mapping and constraints."}
+    }}
+  ],
+  quizzes:[
+    {c:0,topicId:"t_db3",day:"Wed",time:"16:00",t:"Normalisation Quiz",mins:5,maxAtt:2,pass:60,
+     qs:[
+      {q:"Which normal form removes partial dependencies?",o:["1NF","2NF","3NF","BCNF"],a:1,exp:"2NF eliminates partial dependencies on a composite primary key."},
+      {q:"A primary key must be…",o:["Unique and not null","Repeated across rows","Optional for foreign keys"],a:0,exp:"Entity integrity requires every primary key value to be unique and non-null."},
+      {q:"Third Normal Form (3NF) specifically eliminates…",o:["Transitive dependencies","Repeating groups","Foreign keys"],a:0,exp:"3NF removes transitive dependencies where non-key attributes depend on other non-key attributes."}
+     ],
+     attempts:{"Tonny Ariwi":[{score:67,ans:[1,0,1],timedOut:false}],"Faith Njeri":[{score:45,ans:[0,0,1],timedOut:false}]}
+    },
+    {c:0,topicId:"t_db2",day:"Mon",time:"10:15",t:"ER Modelling Check",mins:6,maxAtt:0,pass:60,
+     qs:[
+      {q:"ERD stands for…",o:["Entity Relationship Diagram","Easy Report Data","Entity Record Directory"],a:0,exp:"ERDs visually model entities, attributes, and relationships."},
+      {q:"A weak entity depends on…",o:["An identifying owner entity","No primary key at all","Only a many-to-many join"],a:0,exp:"Weak entities rely on an owner entity's primary key plus a partial discriminator."}
+     ],
+     attempts:{}
+    },
+    {c:1,topicId:"t_se4",day:"Fri",time:"11:15",t:"UML Basics Quiz",mins:10,maxAtt:0,pass:50,
+     qs:[
+      {q:"Which diagram shows actors and their goals?",o:["Use case diagram","Class diagram","Gantt chart"],a:0,exp:"Use case diagrams capture functional requirements via actors and use cases."},
+      {q:"An abstract class…",o:["Cannot be instantiated directly","Has no methods","Is always private"],a:0,exp:"Abstract classes serve as base blueprints and cannot be instantiated."}
+     ],
+     attempts:{"Tonny Ariwi":[{score:100,ans:[0,0],timedOut:false}]}
+    },
+    {c:2,topicId:"t_pr2",day:"Thu",time:"14:00",t:"Research Methods Quiz",mins:8,maxAtt:1,pass:60,
+     qs:[
+      {q:"A questionnaire is mainly used to…",o:["Collect data from many people","Test code","Draw diagrams"],a:0,exp:"Questionnaires efficiently gather structured data from large sample sizes."},
+      {q:"Informed consent means participants…",o:["Agree voluntarily after being told the purpose","Are paid","Stay anonymous only"],a:0,exp:"Ethical research requires voluntary participation with full disclosure."}
+     ],
+     attempts:{}
+    }
+  ],
+  flashcards:[
+    {c:0,front:"First Normal Form (1NF)",back:"Every attribute contains only atomic (indivisible) values and there are no repeating groups.",mastered:{}},
+    {c:0,front:"Second Normal Form (2NF)",back:"Must be in 1NF and every non-key attribute is fully functionally dependent on the entire primary key (no partial dependencies).",mastered:{"Tonny Ariwi":true}},
+    {c:0,front:"Third Normal Form (3NF)",back:"Must be in 2NF and has no transitive dependencies (non-key attributes depend only on the primary key).",mastered:{}},
+    {c:1,front:"Aggregation vs. Composition",back:"Aggregation (hollow diamond) is a weak 'has-a' relationship where parts can exist independently; Composition (filled diamond) implies strong ownership and lifecycle dependency.",mastered:{}},
+    {c:1,front:"Functional vs. Non-Functional Requirements",back:"Functional describe what the system does (features/services); Non-functional describe system qualities (performance, security, reliability).",mastered:{"Tonny Ariwi":true}},
+    {c:2,front:"Purposive Sampling",back:"A non-probability sampling technique where researchers select participants based on specific characteristics relevant to the study.",mastered:{}}
+  ],
+  attendance:[
+    {c:0,date:"Week 4 – Wed Lab",records:{"Tonny Ariwi":"Present","Brian Otieno":"Present","Faith Njeri":"Absent","Kevin Mutua":"Present"}},
+    {c:0,date:"Week 5 – Mon Lecture",records:{"Tonny Ariwi":"Present","Brian Otieno":"Late","Faith Njeri":"Absent","Kevin Mutua":"Present"}},
+    {c:1,date:"Week 4 – Tue Lab",records:{"Tonny Ariwi":"Present","Faith Njeri":"Present","Kevin Mutua":"Absent"}},
+    {c:2,date:"Week 4 – Thu Supervision",records:{"Tonny Ariwi":"Present","Brian Otieno":"Absent"}}
+  ],
+  groups:[
+    {c:0,name:"Schema Architects",topic:"ER Modelling & 3NF Practice",members:["Tonny Ariwi","Brian Otieno"],goal:"Complete past paper 2024 CAT 1 before Friday",notes:["Brian: Shared normalization cheat sheet in notes.","Tonny: Let's meet at ICT Lab 2 after Wednesday's class."]},
+    {c:2,name:"Capstone Peer Review",topic:"Chapter 1–3 Proposal Feedback",members:["Tonny Ariwi"],goal:"Peer-review methodology & sample size calculations",notes:["Tonny: Uploaded ethics clearance checklist."]}
+  ],
+  notifs:[
+    {to:"Tonny Ariwi",text:"Grace Mwangi released your grade (72%) for Assignment 1.",time:"2h ago",read:false},
+    {to:"Tonny Ariwi",text:"Grace Mwangi posted an announcement in CSC 429.",time:"1d ago",read:false},
+    {to:"Grace Mwangi",text:"Brian Otieno submitted brian_erd_v2.pdf for Database assignment 2.",time:"1h ago",read:false},
+    {to:"Grace Mwangi",text:"Kevin Mutua submitted srs_draft_kevin.docx for SRS document draft.",time:"3h ago",read:false}
+  ],
+  qs:{i:0,ans:[],fin:false,rem:0,timedOut:false,tid:null,startedAt:0},
+  pomo:{rem:25*60,running:false,tid:null,taskIdx:null},
+  th:[
+    {t:"When is the ER diagram assignment due?",c:0,topicId:"t_db2",by:"Brian Otieno",ans:1,p:[["Brian Otieno","Is it due this Friday or next week?"],["Grace Mwangi","Next Friday, submitted on the portal."]]},
+    {t:"Difference between 2NF and 3NF?",c:0,topicId:"t_db3",by:"Tonny Ariwi",ans:0,p:[["Tonny Ariwi","I keep mixing these up. Any simple example?"]]},
+    {t:"Which UML tool should we use?",c:1,topicId:"t_se4",by:"Faith Njeri",ans:0,p:[["Faith Njeri","Is draw.io fine for the SRS diagrams?"],["Kevin Mutua","Yes, it exports to PNG and PDF."]]},
+    {t:"How many respondents do we need?",c:2,topicId:"t_pr2",by:"Tonny Ariwi",ans:0,p:[["Tonny Ariwi","Is 40 students enough for the questionnaire?"]]}
+  ],
+  msgs:[
+    {f:"Grace Mwangi",t:"Chapter 3 drafts are due Friday. Bring your questions to the consultation.",c:2},
+    {f:"Grace Mwangi",t:"CAT 2 covers weeks 1–4.",c:0}
+  ],
+  av:[4,4,4,3,4,4,3],plan:null
+});
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return DEFAULT_DATA();
+    const parsed=JSON.parse(raw);
+    return {...DEFAULT_DATA(),...parsed,plan:null,qs:{i:0,ans:[],fin:false,rem:0,timedOut:false,tid:null,startedAt:0},pomo:{rem:25*60,running:false,tid:null,taskIdx:null},preview:null};
+  }catch(e){return DEFAULT_DATA()}
+}
+let S=loadState();
+function applyTheme(){
+  if(S.theme==="dark"||S.theme==="light")document.documentElement.setAttribute("data-theme",S.theme);
+  else document.documentElement.removeAttribute("data-theme");
+}
+applyTheme();
+
+function saveState(){
+  try{
+    const copy={...S,qs:{i:0,ans:[],fin:false,rem:0,timedOut:false,tid:null,startedAt:0},pomo:{rem:25*60,running:false,tid:null,taskIdx:null},preview:null};
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(copy));
+  }catch(e){}
+}
+function resetDemo(){
+  stopQuizTimer();stopPomo();
+  localStorage.removeItem(STORAGE_KEY);
+  S=DEFAULT_DATA();
+  applyTheme();R();
+  toast("Demo data reset to defaults");
+}
+function toggleTheme(){
+  S.theme=S.theme==="dark"?"light":"dark";
+  applyTheme();R();
+  toast(`Switched to ${S.theme} mode`);
+}
+
+const NAV={
+  Student:[["dash","Dashboard"],["res","My Units"],["time","Timetable"],["tasks","Tasks"],["plan","Study Planner"],["quiz","Quizzes"],["disc","Discussions"],["prog","Progress"],["msgs","Messages"],["rep","Reports"]],
+  Instructor:[["dash","Dashboard"],["res","My Units"],["time","Timetable"],["quiz","Quizzes"],["disc","Discussions"],["att","Attendance"],["cls","Class Progress"],["msgs","Messages"],["rep","Reports"]],
+  Administrator:[["dash","Dashboard"],["gov","Governance & Alerts"],["usr","Users and Units"],["time","Timetable"],["rep","Reports"]]
+};
+
+function stopQuizTimer(){if(S.qs.tid){clearInterval(S.qs.tid);S.qs.tid=null}}
+function stopPomo(){if(S.pomo.tid){clearInterval(S.pomo.tid);S.pomo.tid=null}S.pomo.running=false}
+
+function pushNotif(to,text){S.notifs.unshift({to,text,time:"Just now",read:false})}
+const myNotifs=()=>S.notifs.filter(n=>n.to===S.user?.name||n.to==="ALL");
+
+const H=(t,o)=>`<h2>${esc(t)}</h2><span class="obj">${esc(o)}</span>`;
+const U=i=>S.units[i]?`${S.units[i].code} ${S.units[i].name}`:"Unknown Unit";
+const stu=i=>S.units[i]?S.units[i].students.length:0;
+const allStudents=()=>S.acc.filter(a=>a.r==="Student");
+const allInstructors=()=>S.acc.filter(a=>a.r==="Instructor");
+
+// Week & Topic Helpers
+const unitTopics=i=>S.topics.filter(tp=>tp.c===i).sort((a,b)=>a.week-b.week);
+const topicById=id=>S.topics.find(tp=>tp.id===id)||null;
+const topicLabel=id=>{
+  const tp=topicById(id);
+  return tp?`Week ${tp.week}: ${tp.title}`:"General / Unassigned Topic";
+};
+const topicSelectHTML=(unitIdx,elId,selectedId="")=>{
+  const list=unitTopics(unitIdx);
+  return `<select id="${elId}" style="max-width:260px">
+    <option value="">General (No specific topic)</option>
+    ${list.map(tp=>`<option value="${esc(tp.id)}" ${selectedId===tp.id?"selected":""}>Week ${tp.week} — ${esc(tp.title)}</option>`).join("")}
+  </select>`;
+};
+const topicFilterBarHTML=(unitIdx)=>{
+  const list=unitTopics(unitIdx);
+  if(!list.length)return "";
+  return `<div class="row" style="margin-bottom:8px">
+    <small><b>Filter by Topic:</b></small>
+    <button class="pill ${S.topicFilter==="All"?"":"ghost"}" onclick="S.topicFilter='All';R()">All Topics</button>
+    ${list.map(tp=>`<button class="pill ${S.topicFilter===tp.id?"":"ghost"}" onclick="S.topicFilter='${esc(tp.id)}';R()">W${tp.week}: ${esc(tp.title)}</button>`).join("")}
+  </div>`;
+};
+
+const myUnitIndices=()=>{
+  if(S.role==="Administrator")return S.units.map((_,i)=>i);
+  if(S.role==="Instructor")return S.units.map((u,i)=>u.ins===S.user.name?i:-1).filter(i=>i!==-1);
+  return S.units.map((u,i)=>u.students.includes(S.user.name)?i:-1).filter(i=>i!==-1);
+};
+
+// Admin Governance Analytics Engines
+function computeGhostCourses(){
+  return S.units.map((u,i)=>{
+    const insAcc=S.acc.find(a=>a.n===u.ins&&a.r==="Instructor");
+    const lastLoginDays=insAcc?.lastLoginDays??15;
+    const resCount=ofU(S.res,i).length;
+    const msgCount=S.msgs.filter(m=>m.c===i&&m.f===u.ins).length;
+    const asgCount=S.tasks.filter(t=>t.a&&t.c===i).length;
+    const isGhost=lastLoginDays>=14 || (resCount===0 && msgCount===0);
+    const isLow=!isGhost && (lastLoginDays>=7 || resCount<2 || msgCount===0);
+    return{
+      unitIdx:i,code:u.code,name:u.name,ins:u.ins,students:u.students.length,
+      lastLoginDays,resCount,msgCount,asgCount,
+      status:isGhost?"Ghost Course":isLow?"Low Activity":"Active",
+      severity:isGhost?"hi":isLow?"med":"lo"
+    };
+  });
+}
+
+function computeSilentDisengagement(){
+  return allStudents().map(st=>{
+    const days=st.lastLoginDays??0;
+    const enrolled=S.units.filter(u=>u.students.includes(st.n));
+    const subCount=S.tasks.filter(t=>t.a&&(t.subs||{})[st.n]).length;
+    const quizCount=S.quizzes.filter(q=>(q.attempts||{})[st.n]?.length).length;
+    const status=days>=14?"Dormant (14d+ Zero Login)":days>=7?"Slipping (7–13d Inactive)":"Active";
+    return{
+      name:st.n,email:st.e,year:st.year||3,days,feeStatus:st.feeStatus||"Cleared",
+      enrolledCount:enrolled.length,subCount,quizCount,status,
+      severity:days>=14?"hi":days>=7?"med":"lo"
+    };
+  }).sort((a,b)=>b.days-a.days);
+}
+
+function computeCohortFunnel(){
+  return S.cohorts.map((c,idx)=>{
+    const retentionPct=c.enrolled?Math.round(c.retained/c.enrolled*100):100;
+    const lost=c.transfersOut+c.dropouts;
+    const attritionPct=c.enrolled?Math.round(lost/c.enrolled*1000)/10:0;
+    return{...c,idx,retentionPct,lost,attritionPct};
+  });
+}
+
+const lectureHoursForDay=dayIdx=>{
+  const dayName=DAYS[dayIdx], mine=myUnitIndices();
+  return S.timetable.filter(slot=>slot.day===dayName && mine.includes(slot.c)).reduce((sum,slot)=>sum+(slot.hrs||2),0);
+};
+const netFreeHoursForDay=dayIdx=>Math.max(0,(S.av[dayIdx]||0)-lectureHoursForDay(dayIdx));
+
+const loggedHours=t=>(t.logged||{})[S.user?.name]||0;
+const remHours=t=>Math.max(0,(t.h||1)-loggedHours(t));
+
+const taskForMe=t=>{
+  const lh=loggedHours(t), est=t.h||1;
+  if(!t.a)return{done:!!t.done,mark:t.m??null,sub:null,fb:"",status:t.done?"Done":"Pending",lh,est};
+  const s=(t.subs||{})[S.user.name];
+  if(!s)return{done:false,mark:null,sub:null,fb:"",status:"Pending",lh,est};
+  const released=s.status==="Released"&&s.mark!==null;
+  return{done:true,mark:released?s.mark:null,sub:s.file,blobKey:s.blobKey||null,fb:released?s.fb:"",status:released?`Graded (${s.mark}%)`:s.status==="Draft"?"Submitted (In marking)":"Submitted",lh,est};
+};
+
+const ungradedCount=()=>myUnitIndices().reduce((acc,i)=>acc+S.tasks.filter(t=>t.a&&t.c===i).reduce((sum,t)=>sum+Object.values(t.subs||{}).filter(s=>s.status!=="Released").length,0),0);
+const myQuizScores=unitIdx=>ofU(S.quizzes,unitIdx).flatMap(q=>(q.attempts?.[S.user?.name]||[]).map(a=>a.score));
+
+const studentAttendancePct=(stName,unitIdx)=>{
+  const sessions=S.attendance.filter(a=>a.c===unitIdx && a.records[stName]);
+  if(!sessions.length)return 100;
+  const present=sessions.filter(a=>a.records[stName]==="Present"||a.records[stName]==="Late").length;
+  return Math.round(present/sessions.length*100);
+};
+
+const computeAtRiskStudents=()=>{
+  const mine=myUnitIndices(), alerts=[];
+  mine.forEach(i=>{
+    const u=S.units[i], unitAsgs=S.tasks.filter(t=>t.a&&t.c===i), unitQuizzes=ofU(S.quizzes,i);
+    u.students.forEach(stName=>{
+      const attPct=studentAttendancePct(stName,i);
+      const qScores=unitQuizzes.flatMap(q=>(q.attempts?.[stName]||[]).map(a=>a.score));
+      const qAvg=qScores.length?Math.round(qScores.reduce((a,b)=>a+b,0)/qScores.length):null;
+      const missingAsgs=unitAsgs.filter(t=>!(t.subs||{})[stName]).length;
+      const reasons=[];
+      if(attPct<75)reasons.push(`Low attendance (${attPct}%)`);
+      if(qAvg!==null && qAvg<50)reasons.push(`Quiz avg ${qAvg}%`);
+      if(missingAsgs>0)reasons.push(`${missingAsgs} unsubmitted assignment${missingAsgs>1?"s":""}`);
+      if(reasons.length)alerts.push({student:stName,unit:`${u.code} ${u.name}`,attPct,qAvg:qAvg===null?"—":qAvg+"%",reasons:reasons.join(" · ")});
+    });
+  });
+  return alerts;
+};
+
+const ofU=(a,i)=>a.filter(x=>x.c==i);
+const pr=t=>{const s=t.w/Math.max(t.d,1);return[s,s>=4?["High","hi"]:s>=1.5?["Medium","med"]:["Low","lo"]]};
+const pend=()=>{const mine=myUnitIndices();return S.tasks.filter(t=>mine.includes(t.c)&&!taskForMe(t).done).sort((a,b)=>pr(b)[0]-pr(a)[0])};
+const myTasks=()=>{const mine=myUnitIndices();return S.tasks.filter(t=>mine.includes(t.c))};
+const pct=()=>{const T=myTasks();return T.length?Math.round(T.filter(t=>taskForMe(t).done).length/T.length*100):0};
+const grade=()=>{
+  const d=myTasks().map(t=>({w:t.w,m:taskForMe(t).mark})).filter(x=>x.m!==null);
+  const w=d.reduce((a,x)=>a+x.w,0),mw=d.reduce((a,x)=>a+x.m*x.w,0);
+  return{avg:w?Math.round(mw/w):0,w,need:w<100?Math.max(0,Math.min(100,Math.round((7000-mw)/(100-w)))):0};
+};
+const ust=i=>{
+  const T=ofU(S.tasks,i),d=T.filter(t=>taskForMe(t).done).length,sc=myQuizScores(i);
+  const mk=T.map(t=>taskForMe(t).mark).filter(m=>m!==null);
+  return{d,n:T.length,p:T.length?Math.round(d/T.length*100):0,qa:sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length):null,m:mk.length?Math.round(mk.reduce((a,b)=>a+b,0)/mk.length):null};
+};
+const tbl=(h,r)=>`<div class="card"><table><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr>${r.map(x=>`<tr>${x.map(y=>`<td>${y}</td>`).join("")}</tr>`).join("")}</table></div>`;
+
+function openFilePreview(title,fileName,blobKey,summaryText,unitLabel,resIdx=null){
+  if(resIdx!==null && S.res[resIdx])S.res[resIdx].views=(S.res[resIdx].views||0)+1;
+  const blobInfo=blobKey?FILE_BLOBS[blobKey]:null;
+  S.preview={title,fileName:fileName||"document.txt",blobUrl:blobInfo?.url||null,mime:blobInfo?.type||"text/plain",summary:summaryText||"Document attached in StudyHub LMS.",unitLabel};
+  R();
+}
+function downloadPreviewFile(){
+  const p=S.preview;
+  if(!p)return;
+  const a=document.createElement("a");
+  if(p.blobUrl)a.href=p.blobUrl;
+  else{
+    const content=`UNIVERSITY STUDYHUB — RESOURCE / SUBMISSION EXPORT\nTitle: ${p.title}\nUnit: ${p.unitLabel||""}\nFile: ${p.fileName}\n\nSummary / Notes:\n${p.summary}\n`;
+    a.href=URL.createObjectURL(new Blob([content],{type:"text/plain;charset=utf-8"}));
+  }
+  a.download=p.fileName;a.click();
+  toast(`Downloading ${p.fileName}`);
+}
+
+const openU=(i,t,topicId="All")=>{stopQuizTimer();S.unit=i;S.tab=t;S.resCat="All";S.topicFilter=topicId;S.weekFilter="All";S.qi=null;S.ot=null;S.gradeAsg=null;S.qDraft=[];S.fcIdx=0;S.fcFlip=false;R()};
+const unitCards=(tab,t,o)=>{
+  const mine=myUnitIndices();
+  const available=S.role==="Student"?S.units.map((u,i)=>({u,i})).filter(({i})=>!mine.includes(i)):[];
+  return H(t,o)+(mine.length?`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${mine.map(i=>{const u=S.units[i];return `<div class="card unit" onclick="openU(${i},'${tab}')"><b>${esc(u.code)}</b><br>${esc(u.name)}<br><small>Instructor: ${esc(u.ins)}</small><br><small>${unitTopics(i).length} weekly topics · ${ofU(S.res,i).length} resources · ${ofU(S.quizzes,i).length} quizzes · ${ofU(S.th,i).length} discussions</small></div>`}).join("")}</div>`:`<div class="card"><small>You are not ${S.role==="Instructor"?"assigned to":"enrolled in"} any units yet.</small></div>`)+(available.length?`<h3 style="margin-top:18px">Available Units to Self-Enroll</h3><div class="grid">${available.map(({u,i})=>`<div class="card"><b>${esc(u.code)}</b><br>${esc(u.name)}<br><small>Instructor: ${esc(u.ins)} · ${stu(i)} enrolled</small><div style="margin-top:10px"><button class="ghost sm" onclick="enrollStudent(${i}, '${esc(S.user.name)}')">Enroll in unit</button></div></div>`).join("")}</div>`:"");
+};
+
+function computePlan(silent=false){
+  const T=pend().map((t)=>({idx:S.tasks.indexOf(t),t,left:remHours(t)})).filter(x=>x.left>0);
+  const days=[...Array(7)].map((_,i)=>{
+    const dow=(D(i).getDay()+6)%7;
+    const lecHrs=lectureHoursForDay(dow);
+    const netFree=netFreeHoursForDay(dow);
+    return{d:D(i),dow,lecHrs,free:netFree,it:[]};
+  });
+  const warnings=[];
+  T.forEach(item=>{
+    const maxDay=Math.min(6,Math.max(0,item.t.d));
+    if(item.t.d<0)warnings.push(`"${item.t.t}" (${U(item.t.c)}) is already overdue by ${Math.abs(item.t.d)} day(s) with ${item.left}h left.`);
+    days.forEach((day,i)=>{
+      if(item.left>0&&day.free>0&&i<=maxDay){
+        const u=Math.min(item.left,day.free);
+        day.it.push({idx:item.idx,hours:u});day.free-=u;item.left-=u;
+      }
+    });
+    if(item.left>0)warnings.push(`Schedule shortfall: ${item.left}h unscheduled for "${item.t.t}" before its due date (${fd(D(item.t.d))}) after deducting lecture hours.`);
+  });
+  S.plan={days,warnings};
+  R();
+  if(!silent)toast(warnings.length?"Plan generated with schedule warnings":"Study plan generated around your class timetable");
+}
+
+function logStudyHour(taskIdx,amt=1){
+  const t=S.tasks[taskIdx];
+  if(!t)return;
+  t.logged=t.logged||{};
+  t.logged[S.user.name]=Math.round(((t.logged[S.user.name]||0)+amt)*10)/10;
+  const est=t.h||1;
+  if(!t.a && t.logged[S.user.name]>=est && !t.done){
+    t.done=1;
+    toast(`Logged ${amt}h — "${t.t}" reached ${est}h and is marked complete!`);
+  }else toast(`Logged ${amt}h on "${t.t}" (${t.logged[S.user.name]}/${est}h)`);
+  if(S.plan)computePlan(true);else R();
+}
+
+function togglePomo(){
+  if(S.pomo.running){stopPomo();R();return}
+  const pending=pend();
+  if(S.pomo.taskIdx===null && pending.length)S.pomo.taskIdx=S.tasks.indexOf(pending[0]);
+  S.pomo.running=true;
+  S.pomo.tid=setInterval(()=>{
+    if(!S.user||!S.pomo.running){stopPomo();return}
+    S.pomo.rem--;
+    const el=$("#pomoclock");
+    if(el)el.textContent=fmtSec(Math.max(0,S.pomo.rem));
+    if(S.pomo.rem<=0)completePomoSession();
+  },1000);
+  R();
+}
+function resetPomo(){stopPomo();S.pomo.rem=25*60;R()}
+function completePomoSession(){
+  stopPomo();S.pomo.rem=25*60;
+  if(S.pomo.taskIdx!==null && S.tasks[S.pomo.taskIdx]){
+    logStudyHour(S.pomo.taskIdx,0.5);
+    toast("Focus session complete! +0.5h logged to your focus task.");
+  }else{R();toast("Focus session complete!")}
+}
+
+const resIcon=k=>({Books:"📚", "Past Papers":"📝", Notes:"🗒️", Slides:"📊", Other:"📁"}[k]||"📄");
+
+// Weekly Topic Modules View (Weeks -> Topics -> Slides/Resources, Quizzes, Discussions)
+function addTopicModule(unitIdx){
+  const week=Math.max(1,Math.min(16,+$("#tp_week").value||1));
+  const title=$("#tp_title").value.trim();
+  const summary=$("#tp_sum").value.trim()||"Weekly topic learning materials and assessments.";
+  if(!title)return toast("Enter a topic title");
+  S.topics.push({id:"tp_"+Date.now(),c:unitIdx,week,title,summary});
+  R();toast(`Added Topic "${title}" to Week ${week}`);
+}
+
+function quickTopicDiscussion(unitIdx,topicId){
+  const input=$("#qdisc_"+topicId);
+  const title=input?.value.trim();
+  if(!title)return toast("Enter a discussion question or prompt");
+  S.th.unshift({t:title,c:unitIdx,topicId,by:S.user.name,ans:0,p:[[S.user.name,title]]});
+  R();toast("Discussion started under topic");
+}
+
+const modulesView=(i,ins)=>{
+  const topics=unitTopics(i);
+  const weeks=[...new Set(topics.map(tp=>tp.week))].sort((a,b)=>a-b);
+  const visibleWeeks=S.weekFilter==="All"?weeks:weeks.filter(w=>w===+S.weekFilter);
+
+  const builder=ins?`<div class="card">
+    <b>Add Weekly Topic Module</b>
+    <div class="row" style="margin-top:8px;margin-bottom:0">
+      <select id="tp_week" style="width:115px">${[...Array(14)].map((_,w)=>`<option value="${w+1}">Week ${w+1}</option>`).join("")}</select>
+      <input id="tp_title" placeholder="Topic title (e.g. Relational Algebra & Joins)" style="flex:1">
+      <input id="tp_sum" placeholder="Brief topic learning outcome / summary" style="flex:1">
+      <button class="sm" onclick="addTopicModule(${i})">+ Add Topic</button>
+    </div>
+  </div>`:"";
+
+  const weekPills=`<div class="row">
+    <small><b>Jump to Week:</b></small>
+    <button class="pill ${S.weekFilter==="All"?"":"ghost"}" onclick="S.weekFilter='All';R()">All Weeks (${weeks.length})</button>
+    ${weeks.map(w=>`<button class="pill ${S.weekFilter===String(w)?"":"ghost"}" onclick="S.weekFilter='${w}';R()">Week ${w}</button>`).join("")}
+  </div>`;
+
+  const unassignedRes=S.res.map((r,idx)=>({r,idx})).filter(({r})=>r.c===i && !r.topicId);
+  const unassignedQz=S.quizzes.map((q,k)=>({q,k})).filter(({q})=>q.c===i && !q.topicId);
+  const unassignedTh=S.th.map((t,k)=>({t,k})).filter(({t})=>t.c===i && !t.topicId);
+
+  return builder + weekPills + (visibleWeeks.map(w=>{
+    const wTopics=topics.filter(tp=>tp.week===w);
+    return `<div class="week-banner">
+      <div><b style="font-size:16px">📅 Week ${w}</b> · <small>${wTopics.length} Topic${wTopics.length===1?"":"s"}</small></div>
+      <span class="tag">Semester Schedule</span>
+    </div>`+
+    wTopics.map(tp=>{
+      const tpRes=S.res.map((r,idx)=>({r,idx})).filter(({r})=>r.c===i && r.topicId===tp.id);
+      const tpQz=S.quizzes.map((q,k)=>({q,k})).filter(({q})=>q.c===i && q.topicId===tp.id);
+      const tpTh=S.th.map((t,k)=>({t,k})).filter(({t})=>t.c===i && t.topicId===tp.id);
+
+      return `<div class="topic-box">
+        <div class="row" style="justify-content:space-between;margin-bottom:2px">
+          <div><b style="font-size:16px">📌 ${esc(tp.title)}</b><br><small>${esc(tp.summary)}</small></div>
+          <span class="tag">Week ${w}</span>
+        </div>
+        <div class="topic-cols">
+          <div class="topic-col">
+            <h5><span>📊 Slides & Materials (${tpRes.length})</span><button class="link" onclick="S.tab='books';S.topicFilter='${esc(tp.id)}';R()">All →</button></h5>
+            ${tpRes.map(({r,idx})=>`<div class="mini-item">
+              <span>${resIcon(r.k)} ${esc(r.t)}</span>
+              <button class="ghost sm" style="padding:2px 8px;min-height:26px;font-size:12px" onclick="openFilePreview('${esc(r.t)}','${esc(r.file||"resource.pdf")}','${esc(r.blobKey||"")}','${esc(r.summary||r.x)}','${esc(U(i))}',${idx})">View</button>
+            </div>`).join("")||`<small>No slides or notes linked yet.</small>`}
+          </div>
+
+          <div class="topic-col">
+            <h5><span>📝 Topic Quizzes (${tpQz.length})</span><button class="link" onclick="S.tab='quiz';S.topicFilter='${esc(tp.id)}';R()">All →</button></h5>
+            ${tpQz.map(({q,k})=>{
+              const myAtt=q.attempts?.[S.user.name]||[];
+              const best=myAtt.length?Math.max(...myAtt.map(a=>a.score)):null;
+              return `<div class="mini-item">
+                <div><b>${esc(q.t)}</b><br><small>${q.qs.length} Qs · ${q.mins}m${best!==null?` · Best: ${best}%`:""}</small></div>
+                ${ins?`<button class="ghost sm" style="padding:2px 8px;min-height:26px;font-size:12px" onclick="S.tab='quiz';S.topicFilter='${esc(tp.id)}';R()">Manage</button>`:`<button class="sm" style="padding:2px 8px;min-height:26px;font-size:12px" onclick="S.tab='quiz';startQuiz(${k})">${myAtt.length?"Retake":"Start"}</button>`}
+              </div>`;
+            }).join("")||`<small>No quiz for this topic.</small>`}
+          </div>
+
+          <div class="topic-col">
+            <h5><span>💬 Topic Discussions (${tpTh.length})</span><button class="link" onclick="S.tab='disc';S.topicFilter='${esc(tp.id)}';R()">All →</button></h5>
+            ${tpTh.map(({t,k})=>`<div class="mini-item">
+              <span style="cursor:pointer;text-decoration:underline" onclick="S.tab='disc';S.ot=${k};R()">${esc(t.t)}</span>
+              <span class="tag">${t.p.length-1} repl</span>
+            </div>`).join("")||`<small>No discussion threads yet.</small>`}
+            <div class="row" style="margin-top:6px;margin-bottom:0">
+              <input id="qdisc_${esc(tp.id)}" placeholder="Ask on this topic..." style="min-height:30px;padding:4px 8px;font-size:12px;flex:1">
+              <button class="ghost sm" style="min-height:30px;padding:4px 8px;font-size:12px" onclick="quickTopicDiscussion(${i},'${esc(tp.id)}')">Post</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }).join("")||`<div class="card"><small>No weekly topics defined for this unit yet.</small></div>`) +
+  ((unassignedRes.length||unassignedQz.length||unassignedTh.length)?`<div class="card" style="margin-top:14px">
+    <b>General Course Items (Not tied to a specific week)</b>
+    <p style="margin:6px 0 0"><small>${unassignedRes.length} general resources · ${unassignedQz.length} general quizzes · ${unassignedTh.length} general discussions</small></p>
+  </div>`:"");
+};
+
+function addResource(i){
+  const t=$("#ut").value.trim(), k=$("#uk").value, topicId=$("#utopic").value||null, x=$("#ux").value.trim()||"Uploaded resource";
+  const fileInput=$("#ufile");
+  const f=fileInput?.files?.[0];
+  if(!t && !f)return toast("Enter a title or pick a file to upload");
+  const finalTitle=t||f.name;
+  let blobKey=null, fileName=finalTitle.toLowerCase().replace(/\s+/g,"_")+".pdf";
+  if(f){
+    blobKey="res_"+Date.now();
+    FILE_BLOBS[blobKey]={url:URL.createObjectURL(f),type:f.type||"application/octet-stream",name:f.name};
+    fileName=f.name;
+  }
+  S.res.unshift({t:finalTitle,c:i,topicId,k,x,views:1,file:fileName,blobKey,summary:`Uploaded by ${S.user.name} (${x}).`});
+  S.resCat=k;R();
+  toast(`Published "${finalTitle}" to ${k}`);
+}
+function deleteResource(idx){S.res.splice(idx,1);R();toast("Resource removed")}
+
+const bks=(i,ins)=>{
+  let unitRes=S.res.map((r,idx)=>({r,idx})).filter(({r})=>r.c==i);
+  if(S.topicFilter!=="All")unitRes=unitRes.filter(({r})=>r.topicId===S.topicFilter);
+  const activeCat=RES_CATS.includes(S.resCat)?S.resCat:"All";
+  const uploadForm=ins?`<div class="card">
+    <b>Upload slides or study resource (grouped by Week & Topic)</b>
+    <div class="row" style="margin-top:8px">
+      <input id="ut" placeholder="Resource / Slide deck title" style="flex:2">
+      <select id="uk">${RES_CATS.map(c=>`<option value="${c}" ${activeCat===c?"selected":""}>${c}</option>`).join("")}</select>
+      ${topicSelectHTML(i,"utopic",S.topicFilter!=="All"?S.topicFilter:"")}
+    </div>
+    <div class="row" style="margin-bottom:0">
+      <input id="ux" placeholder="Subtitle / Label (e.g. Lecture Deck)" style="flex:1">
+      <input id="ufile" type="file" style="flex:1">
+      <button onclick="addResource(${i})">Upload & publish</button>
+    </div>
+  </div>`:"";
+
+  const filterBar=topicFilterBarHTML(i)+`<div class="row">
+    <small><b>Resource Type:</b></small>
+    <button class="pill ${activeCat==="All"?"":"ghost"}" onclick="S.resCat='All';R()">All (${unitRes.length})</button>
+    ${RES_CATS.map(c=>{
+      const cnt=unitRes.filter(({r})=>r.k===c).length;
+      return `<button class="pill ${activeCat===c?"":"ghost"}" onclick="S.resCat='${c}';R()">${resIcon(c)} ${c} (${cnt})</button>`;
+    }).join("")}
+  </div>`;
+
+  const renderItem=({r,idx})=>`<div class="item">
+    <div>
+      <b>${esc(r.t)}</b> · <span class="tag">${esc(topicLabel(r.topicId))}</span><br>
+      <small>${esc(r.x)} · File: <u>${esc(r.file||"document.pdf")}</u> · ${r.views||0} views</small>
+    </div>
+    <div class="row" style="margin:0">
+      <span class="tag">${resIcon(r.k)} ${esc(r.k)}</span>
+      <button class="ghost sm" onclick="openFilePreview('${esc(r.t)}','${esc(r.file||"resource.pdf")}','${esc(r.blobKey||"")}','${esc(r.summary||r.x)}','${esc(U(i))}',${idx})">Preview</button>
+      ${ins?`<button class="ghost sm" onclick="deleteResource(${idx})">Delete</button>`:""}
+    </div>
+  </div>`;
+
+  if(activeCat!=="All"){
+    const filtered=unitRes.filter(({r})=>r.k===activeCat);
+    return uploadForm+filterBar+`<div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:4px">
+        <b>${resIcon(activeCat)} ${esc(activeCat)}</b>
+        <small>${filtered.length} item${filtered.length===1?"":"s"}</small>
+      </div>
+      ${filtered.map(renderItem).join("")||`<small>No ${esc(activeCat.toLowerCase())} found for this filter.</small>`}
+    </div>`;
+  }
+
+  return uploadForm+filterBar+RES_CATS.map(cat=>{
+    const items=unitRes.filter(({r})=>r.k===cat);
+    return `<div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:4px">
+        <b>${resIcon(cat)} ${esc(cat)}</b>
+        <small>${items.length} item${items.length===1?"":"s"}</small>
+      </div>
+      ${items.map(renderItem).join("")||`<small>No ${esc(cat.toLowerCase())} in this selection.</small>`}
+    </div>`;
+  }).join("");
+};
+
+const asg=(i,ins)=>{
+  if(ins && S.gradeAsg!==null && S.tasks[S.gradeAsg]){
+    const k=S.gradeAsg, t=S.tasks[k], roster=S.units[i].students, subs=t.subs||{};
+    const subCount=Object.keys(subs).length, draftCount=Object.values(subs).filter(s=>s.status==="Draft").length;
+    return `<div class="row" style="justify-content:space-between">
+      <button class="ghost sm" onclick="S.gradeAsg=null;R()">← Back to assignments</button>
+      ${draftCount?`<button class="sm" onclick="releaseGrades(${k})">Release ${draftCount} graded mark${draftCount>1?"s":""} to students</button>`:""}
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:4px">
+        <div><b style="font-size:17px">${esc(t.t)}</b><br><small>Due ${fd(D(t.d))} · Weight: ${t.w}% · ${subCount} of ${roster.length} submitted</small></div>
+        <span class="tag">${Object.values(subs).filter(s=>s.status==="Released").length} Released</span>
+      </div>
+      ${roster.map((stName,idx)=>{
+        const s=subs[stName];
+        if(!s)return `<div class="item"><div><b>${esc(stName)}</b><br><small>No submission yet</small></div><span class="hi">Missing</span></div>`;
+        return `<div class="item" style="flex-direction:column;align-items:stretch">
+          <div class="row" style="justify-content:space-between;margin-bottom:4px">
+            <div><b>${esc(stName)}</b> · <small>File: <u>${esc(s.file)}</u></small></div>
+            <div class="row" style="margin:0">
+              <button class="ghost sm" onclick="openFilePreview('${esc(t.t)} — ${esc(stName)}','${esc(s.file)}','${esc(s.blobKey||"")}','${esc(s.note||"Student assignment submission.")}','${esc(U(i))}')">Inspect file</button>
+              <span class="${s.status==="Released"?"lo":s.status==="Draft"?"med":"tag"}">${esc(s.status)}</span>
+            </div>
+          </div>
+          <div class="row" style="margin-bottom:0">
+            <input id="mk_${k}_${idx}" type="number" min="0" max="100" value="${s.mark??""}" placeholder="Score /100" style="width:115px">
+            <input id="fb_${k}_${idx}" value="${esc(s.fb)}" placeholder="Feedback comment for student" style="flex:1">
+            <button class="ghost sm" onclick="saveGrade(${k}, '${esc(stName)}', ${idx}, 'Draft')">Save draft</button>
+            <button class="sm" onclick="saveGrade(${k}, '${esc(stName)}', ${idx}, 'Released')">Grade & release</button>
+          </div>
+        </div>`;
+      }).join("")||"<small>No students enrolled in this unit.</small>"}
+    </div>`;
+  }
+
+  return (ins?`<div class="card"><b>Create assignment</b><div class="row" style="margin-top:8px"><input id="at" placeholder="Title" style="flex:1"><input id="ad" type="date"><input id="aw" type="number" placeholder="Weight %" style="width:110px"><input id="ah" type="number" placeholder="Est. hrs" style="width:95px"><button onclick="addAsg(${i})">Create</button></div></div>`:"")+
+  `<div class="card">${S.tasks.map((t,k)=>[t,k]).filter(([t])=>t.a&&t.c==i).map(([t,k])=>{
+    if(ins){
+      const subs=t.subs||{}, subN=Object.keys(subs).length, ungraded=Object.values(subs).filter(s=>s.status!=="Released").length;
+      return `<div class="item">
+        <div><b>${esc(t.t)}</b><br><small>due ${fd(D(t.d))} · ${t.w}% · ${subN} of ${stu(i)} submitted${ungraded?` · <span class="hi">${ungraded} to grade</span>`:""}</small></div>
+        <button class="ghost sm" onclick="S.gradeAsg=${k};R()">Grade submissions</button>
+      </div>`;
+    }
+    const me=taskForMe(t);
+    return `<div class="item" style="align-items:flex-start">
+      <div style="flex:1">
+        <b>${esc(t.t)}</b><br><small>due ${fd(D(t.d))} · ${t.w}% · Study logged: ${me.lh}/${me.est}h</small>
+        ${me.sub?`<br><small>Submitted: <b>${esc(me.sub)}</b> <button class="link" onclick="openFilePreview('${esc(t.t)}','${esc(me.sub)}','${esc(me.blobKey||"")}','Submitted by ${esc(S.user.name)}','${esc(U(i))}')">(Preview)</button></small>`:""}
+        ${me.fb?`<div class="fb"><b>Instructor feedback:</b> ${esc(me.fb)}</div>`:""}
+        ${me.mark===null?`<div class="row" style="margin-top:6px;margin-bottom:0">
+          <input id="ffile${k}" type="file" style="max-width:240px">
+          <input id="f${k}" placeholder="${me.sub?"Or type new file name...":"Or type file name (e.g. report.pdf)"}" style="min-height:36px;padding:6px 10px;flex:1">
+          <button class="sm" onclick="submitA(${k})">${me.sub?"Resubmit":"Submit"}</button>
+        </div>`:""}
+      </div>
+      <span class="${me.mark!==null?"lo":me.done?"med":"hi"}">${esc(me.status)}</span>
+    </div>`;
+  }).join("")||"<small>No assignments yet.</small>"}</div>`;
+};
+
+const qz=(i,ins)=>{
+  if(S.qi!==null && S.quizzes[S.qi]){
+    const q=S.quizzes[S.qi], s=S.qs;
+    if(s.fin){
+      const n=q.qs.filter((x,j)=>s.ans[j]===x.a).length;
+      const score=Math.round(n/q.qs.length*100);
+      const passed=score>=(q.pass||50);
+      return `<div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div><b style="font-size:18px">${esc(q.t)}: ${n} / ${q.qs.length} (${score}%)</b><br><small>${esc(topicLabel(q.topicId))} · ${s.timedOut?"⏰ Time expired — auto-submitted":"Completed"} · Pass threshold: ${q.pass||50}%</small></div>
+          <span class="${passed?"lo":"hi"}">${passed?"PASSED":"FAILED"}</span>
+        </div>
+        ${q.qs.map((x,j)=>{
+          const chosen=s.ans[j], ok=chosen===x.a;
+          return `<div class="item" style="flex-direction:column;align-items:stretch">
+            <div><b>${j+1}. ${esc(x.q)}</b></div>
+            <small>Your answer: <span class="${ok?"lo":"hi"}">${chosen!==undefined&&chosen!==null?esc(x.o[chosen]):"Unanswered (Time out)"}</span> · Correct: <b>${esc(x.o[x.a])}</b></small>
+            ${x.exp?`<div class="fb">${esc(x.exp)}</div>`:""}
+          </div>`;
+        }).join("")}
+        <div style="margin-top:12px"><button onclick="S.qi=null;R()">Back to quizzes</button></div>
+      </div>`;
+    }
+    const x=q.qs[s.i];
+    return `<div class="card">
+      <div class="row" style="justify-content:space-between">
+        <small><b>${esc(q.t)}</b> (${esc(topicLabel(q.topicId))}) · Question ${s.i+1} of ${q.qs.length}</small>
+        <span id="qtimer" class="timer ${s.rem<=60?"urgent":""}">⏱ ${fmtSec(s.rem)}</span>
+      </div>
+      <div class="bar" style="margin-bottom:12px"><i style="width:${Math.round((s.i)/q.qs.length*100)}%"></i></div>
+      <p style="font-size:16px"><b>${esc(x.q)}</b></p>
+      ${x.o.map((o,j)=>`<button class="opt" onclick="ans(${j})">${String.fromCharCode(65+j)}. ${esc(o)}</button>`).join("")}
+      <div class="row" style="justify-content:space-between;margin-top:10px;margin-bottom:0">
+        <small>Auto-submits when the timer reaches 00:00</small>
+        <button class="ghost sm" onclick="finishQuiz(false)">Submit early</button>
+      </div>
+    </div>`;
+  }
+
+  const builder=ins?`<div class="card">
+    <b>Create topic-linked multi-question quiz</b>
+    <div class="row" style="margin-top:8px">
+      <input id="qt" placeholder="Quiz title (e.g. SQL Joins Quiz)" style="flex:2">
+      ${topicSelectHTML(i,"qtopic",S.topicFilter!=="All"?S.topicFilter:"")}
+      <select id="qday" title="Scheduled day">${DAYS.map(d=>`<option>${d}</option>`).join("")}</select>
+      <input id="qtime" value="10:00" placeholder="Time" style="width:85px">
+      <input id="qmins" type="number" min="1" max="120" value="10" title="Duration in minutes" style="width:75px">
+      <select id="qatt" title="Allowed attempts"><option value="0">Unlimited</option><option value="1">1 attempt</option><option value="2">2 attempts</option></select>
+      <input id="qpass" type="number" min="1" max="100" value="60" title="Pass mark %" style="width:75px">
+    </div>
+    <div style="background:var(--bg);padding:10px;border-radius:8px;margin-bottom:10px">
+      <small><b>Add question to quiz:</b></small>
+      <div class="row" style="margin-top:6px"><input id="qq" placeholder="Question prompt" style="flex:1"></div>
+      <div class="row">
+        <input id="qo0" placeholder="Option A" style="flex:1">
+        <input id="qo1" placeholder="Option B" style="flex:1">
+        <input id="qo2" placeholder="Option C" style="flex:1">
+        <input id="qo3" placeholder="Option D (optional)" style="flex:1">
+      </div>
+      <div class="row" style="margin-bottom:0">
+        <select id="qcor"><option value="0">Correct: Option A</option><option value="1">Correct: Option B</option><option value="2">Correct: Option C</option><option value="3">Correct: Option D</option></select>
+        <input id="qexp" placeholder="Explanation shown after submission (optional)" style="flex:1">
+        <button class="ghost sm" onclick="stageQuestion()">+ Add question (${S.qDraft.length})</button>
+      </div>
+    </div>
+    ${S.qDraft.length?`<div style="margin-bottom:10px"><small><b>Staged questions (${S.qDraft.length}):</b></small>${S.qDraft.map((dq,idx)=>`<div class="item" style="padding:6px 0"><small>${idx+1}. ${esc(dq.q)} (Ans: ${esc(dq.o[dq.a])})</small><button class="ghost sm" onclick="S.qDraft.splice(${idx},1);R()">Remove</button></div>`).join("")}</div>`:""}
+    <button onclick="publishQuiz(${i})">Publish quiz (${S.qDraft.length} question${S.qDraft.length===1?"":"s"})</button>
+  </div>`:"";
+
+  const unitQuizzes=S.quizzes.map((q,k)=>[q,k]).filter(([q])=>q.c==i && (S.topicFilter==="All" || q.topicId===S.topicFilter));
+  const groups=[...unitTopics(i).map(tp=>({id:tp.id,label:`Week ${tp.week} — ${tp.title}`,items:unitQuizzes.filter(([q])=>q.topicId===tp.id)})),{id:null,label:"General Unit Quizzes",items:unitQuizzes.filter(([q])=>!q.topicId)}].filter(g=>g.items.length>0);
+
+  return builder + topicFilterBarHTML(i) + (groups.map(grp=>`<div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <b>📌 ${esc(grp.label)}</b>
+      <small>${grp.items.length} quiz${grp.items.length===1?"":"zes"}</small>
+    </div>
+    ${grp.items.map(([q,k])=>{
+      const myAtt=q.attempts?.[S.user.name]||[];
+      const best=myAtt.length?Math.max(...myAtt.map(a=>a.score)):null;
+      const locked=!ins && q.maxAtt>0 && myAtt.length>=q.maxAtt;
+      const totalAttempts=Object.values(q.attempts||{}).reduce((sum,arr)=>sum+arr.length,0);
+      return `<div class="item">
+        <div>
+          <b>${esc(q.t)}</b> ${q.day?`<span class="tag">${esc(q.day)} ${esc(q.time||"")}</span>`:""}<br>
+          <small>${q.qs.length} question${q.qs.length>1?"s":""} · ${q.mins||10} min timer · Pass: ${q.pass||50}% · ${q.maxAtt?q.maxAtt+" attempt"+(q.maxAtt>1?"s":""):"Unlimited attempts"}</small>
+          ${!ins && myAtt.length?`<br><small>Your attempts: ${myAtt.length}${q.maxAtt?"/"+q.maxAtt:""} · Best score: <b class="${best>=(q.pass||50)?"lo":"hi"}">${best}%</b></small>`:""}
+          ${ins?`<br><small>${totalAttempts} student attempt${totalAttempts===1?"":"s"} recorded</small>`:""}
+        </div>
+        <div class="row" style="margin:0">
+          ${!ins && myAtt.length?`<button class="ghost sm" onclick="reviewLastQuiz(${k})">Review last</button>`:""}
+          ${ins?`<button class="ghost sm" onclick="deleteQuiz(${k})">Delete</button>`:locked?`<span class="tag">Max attempts reached</span>`:`<button class="sm" onclick="startQuiz(${k})">${myAtt.length?"Retake":"Start quiz"}</button>`}
+        </div>
+      </div>`;
+    }).join("")}
+  </div>`).join("")||`<div class="card"><small>No quizzes found for this topic filter.</small></div>`);
+};
+
+const fcards=(i)=>{
+  const all=S.flashcards.map((c,idx)=>({c,idx})).filter(({c})=>c.c===i);
+  const deck=S.fcFilter==="review"?all.filter(({c})=>!c.mastered?.[S.user.name]):all;
+  const masteredCount=all.filter(({c})=>c.mastered?.[S.user.name]).length;
+  const safeIdx=deck.length?S.fcIdx%deck.length:0;
+  const cur=deck[safeIdx];
+
+  return `<div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div><b>Unit Flashcard Deck</b> · <small>${masteredCount} of ${all.length} mastered</small></div>
+      <div class="row" style="margin:0">
+        <button class="pill ${S.fcFilter==="all"?"":"ghost"}" onclick="S.fcFilter='all';S.fcIdx=0;S.fcFlip=false;R()">All (${all.length})</button>
+        <button class="pill ${S.fcFilter==="review"?"":"ghost"}" onclick="S.fcFilter='review';S.fcIdx=0;S.fcFlip=false;R()">Needs review (${all.length-masteredCount})</button>
+      </div>
+    </div>
+    ${cur?`
+      <div class="flashcard" onclick="S.fcFlip=!S.fcFlip;R()">
+        <span class="tag" style="margin-bottom:10px">${S.fcFlip?"DEFINITION / ANSWER":"CONCEPT / PROMPT"} · Card ${safeIdx+1} of ${deck.length}</span>
+        <div style="font-size:${S.fcFlip?"16px":"20px"};font-weight:${S.fcFlip?"400":"700"};max-width:600px">${esc(S.fcFlip?cur.c.back:cur.c.front)}</div>
+        <small style="margin-top:14px">Click card to flip</small>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-bottom:0">
+        <button class="ghost sm" onclick="S.fcIdx=(S.fcIdx-1+${deck.length})%${deck.length};S.fcFlip=false;R()">← Previous</button>
+        <div class="row" style="margin:0">
+          <button class="ghost sm" onclick="setCardMastery(${cur.idx},false)">Needs review</button>
+          <button class="sm" onclick="setCardMastery(${cur.idx},true)">✓ Mark mastered</button>
+        </div>
+        <button class="ghost sm" onclick="S.fcIdx=(S.fcIdx+1)%${deck.length};S.fcFlip=false;R()">Next →</button>
+      </div>
+    `:`<p><small>No flashcards in this filter. Great job mastering the deck!</small></p>`}
+  </div>
+  <div class="card">
+    <b>Add flashcard to ${esc(S.units[i].code)}</b>
+    <div class="row" style="margin-top:8px;margin-bottom:0">
+      <input id="fcf" placeholder="Front (Term or question)" style="flex:1">
+      <input id="fcb" placeholder="Back (Definition or explanation)" style="flex:2">
+      <button class="sm" onclick="addFlashcard(${i})">Add card</button>
+    </div>
+  </div>`;
+};
+
+const studyGroups=(i)=>{
+  const unitGroups=S.groups.map((g,idx)=>({g,idx})).filter(({g})=>g.c===i);
+  return `<div class="card">
+    <b>Create a peer study group</b>
+    <div class="row" style="margin-top:8px;margin-bottom:0">
+      <input id="gname" placeholder="Group name (e.g. SQL Query Squad)" style="flex:1">
+      <input id="gtopic" placeholder="Focus topic or milestone" style="flex:2">
+      <button class="sm" onclick="createGroup(${i})">Create group</button>
+    </div>
+  </div>`+
+  (unitGroups.map(({g,idx})=>{
+    const isMember=g.members.includes(S.user.name);
+    return `<div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:4px">
+        <div><b style="font-size:16px">${esc(g.name)}</b> · <span class="tag">${g.members.length} member${g.members.length===1?"":"s"}</span><br><small>Focus: ${esc(g.topic)}</small></div>
+        ${isMember?`<button class="ghost sm" onclick="leaveGroup(${idx})">Leave group</button>`:`<button class="sm" onclick="joinGroup(${idx})">Join group</button>`}
+      </div>
+      <small>Members: ${g.members.map(esc).join(", ")||"None"}</small>
+      <div style="margin-top:8px">${g.notes.map(n=>`<div class="fb" style="margin-top:4px">${esc(n)}</div>`).join("")}</div>
+      ${isMember?`<div class="row" style="margin-top:8px;margin-bottom:0">
+        <input id="gnote_${idx}" placeholder="Post a note or meeting time to group..." style="flex:1;min-height:36px;padding:6px 10px">
+        <button class="sm" onclick="postGroupNote(${idx})">Post</button>
+      </div>`:""}
+    </div>`;
+  }).join("")||`<div class="card"><small>No study groups in this unit yet. Start one above!</small></div>`);
+};
+
+const dsc=i=>{
+  const o=S.ot;
+  if(o!==null){
+    const t=S.th[o],can=S.role!="Student"||t.by==S.user.name;
+    return `<button class="ghost" onclick="S.ot=null;R()">← Back to threads</button><h3 style="margin:12px 0 4px">${esc(t.t)}</h3><span class="obj">${esc(topicLabel(t.topicId))} · started by ${esc(t.by)}${t.ans?" · Answered":""}</span><div class="card">${t.p.map(([b,x],j)=>`<div class="item"><div><b>${esc(b)}</b>${j&&t.ans==j?` <span class="tag">Best answer</span>`:""}<br>${esc(x)}</div>${j&&can&&t.ans!=j?`<button class="ghost" onclick="S.th[${o}].ans=${j};R();toast('Marked as the best answer')">Mark best answer</button>`:""}</div>`).join("")}</div><div class="card"><div class="row"><input id="rp" placeholder="Write a reply" style="flex:1"><button onclick="replyThread(${o})">Reply</button></div></div>`;
+  }
+  const unitThreads=S.th.map((t,k)=>[t,k]).filter(([t])=>t.c==i && (S.topicFilter==="All" || t.topicId===S.topicFilter));
+  const groups=[...unitTopics(i).map(tp=>({id:tp.id,label:`Week ${tp.week} — ${tp.title}`,items:unitThreads.filter(([t])=>t.topicId===tp.id)})),{id:null,label:"General Unit Discussions",items:unitThreads.filter(([t])=>!t.topicId)}].filter(g=>g.items.length>0);
+
+  return `<div class="card">
+    <b>Start a topic-linked discussion</b>
+    <div class="row" style="margin-top:8px;margin-bottom:0">
+      <input id="dt" placeholder="Discussion question or thread title" style="flex:1">
+      ${topicSelectHTML(i,"dtopic",S.topicFilter!=="All"?S.topicFilter:"")}
+      <button onclick="newTh(${i})">Post</button>
+    </div>
+  </div>` + topicFilterBarHTML(i) +
+  (groups.map(grp=>`<div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <b>📌 ${esc(grp.label)}</b>
+      <small>${grp.items.length} thread${grp.items.length===1?"":"s"}</small>
+    </div>
+    ${grp.items.map(([t,k])=>`<div class="item" style="cursor:pointer" onclick="S.ot=${k};R()"><div>${esc(t.t)}<br><small>${esc(t.by)} · ${t.p.length-1} replies</small></div><span class="tag">${t.ans?"Answered":"Open"}</span></div>`).join("")}
+  </div>`).join("")||`<div class="card"><small>No discussions found for this topic filter.</small></div>`);
+};
+
+function unitPage(){const i=S.unit,t=S.tab,ins=S.role=="Instructor",A=S.tasks.filter(x=>x.a&&x.c==i).length;
+const tile=(k,l,n)=>`<div class="card unit ${t==k?"sel":""}" onclick="stopQuizTimer();S.tab='${k}';S.qi=null;S.ot=null;S.gradeAsg=null;R()"><b>${n}</b><br>${l}</div>`;
+return `<button class="ghost" onclick="stopQuizTimer();S.unit=null;S.gradeAsg=null;R()">← All units</button><h2 style="margin-top:12px">${esc(U(i))}</h2><span class="obj">Instructor: ${esc(S.units[i].ins)} · ${stu(i)} students enrolled</span>
+<div class="grid tiles">
+  ${tile("modules","Weeks & Topics",unitTopics(i).length)}
+  ${tile("books","Slides & Files",ofU(S.res,i).length)}
+  ${tile("quiz","Quizzes",ofU(S.quizzes,i).length)}
+  ${tile("disc","Discussions",ofU(S.th,i).length)}
+  ${tile("assign","Assignments",A)}
+  ${tile("cards","Flashcards",ofU(S.flashcards,i).length)}
+  ${tile("groups","Study Groups",ofU(S.groups,i).length)}
+</div>`+({modules:modulesView,books:bks,assign:asg,quiz:qz,cards:fcards,groups:studyGroups,disc:dsc}[t])(i,ins)}
+const unitView=(tab,t,o)=>S.unit!==null?unitPage():unitCards(tab,t,o);
+
+// Governance UI Builders
+function renderCohortFunnelCard(isReport=false){
+  const funnel=computeCohortFunnel();
+  const worst=funnel.reduce((a,b)=>b.attritionPct>a.attritionPct?b:a,funnel[0]);
+  return `<div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px">
+      <div><b>📈 Cohort Progression & Transfer Funnel (Year 1 → Year 4)</b><br><small>Highest attrition bottleneck: <span class="hi">${esc(worst.year)} (${worst.attritionPct}% lost · ${worst.transfersOut} transfers, ${worst.dropouts} dropouts)</span></small></div>
+      <span class="tag">Overall Y1→Y4 Survival: ${Math.round(funnel[3].retained/funnel[0].enrolled*100)}%</span>
+    </div>
+    ${funnel.map(c=>`<div class="funnel-row">
+      <div><b>${esc(c.year)}</b><br><small>Mean GPA: ${c.gpa}%</small></div>
+      <div>
+        <div class="bar"><i style="width:${c.retentionPct}%"></i></div>
+        <small>${c.retained} retained of ${c.enrolled} · ${c.transfersOut} transfers out · ${c.dropouts} dropouts</small>
+      </div>
+      <div style="text-align:right"><b class="${c.retentionPct>=90?"lo":c.retentionPct>=85?"med":"hi"}">${c.retentionPct}% Retained</b><br><small>-${c.attritionPct}% attrition</small></div>
+    </div>`).join("")}
+  </div>`;
+}
+
+function renderGhostCoursesTable(isReport=false){
+  const list=computeGhostCourses();
+  const headers=isReport?["Unit","Instructor","Enrolled","Last Login","Resources","Announcements","Status"]:["Unit","Instructor","Enrolled","Last Login","Resources","Announcements","Status","Action"];
+  const rows=list.map(g=>{
+    const base=[
+      `${esc(g.code)} ${esc(g.name)}`,
+      esc(g.ins),
+      `${g.students}`,
+      g.lastLoginDays===0?"Today":`${g.lastLoginDays}d ago`,
+      `${g.resCount}`,
+      `${g.msgCount}`,
+      `<span class="${g.severity}">${g.status==="Ghost Course"?"👻 Ghost Course":g.status==="Low Activity"?"⚠️ Low Activity":"✅ Active"}</span>`
+    ];
+    if(!isReport)base.push(g.status!=="Active"?`<button class="ghost sm" onclick="nudgeInstructor('${esc(g.ins)}','${esc(g.code)}')">Nudge lecturer</button>`:`<small>—</small>`);
+    return base;
+  });
+  return tbl(headers,rows);
+}
+
+function renderSilentDisengagementTable(isReport=false){
+  const list=computeSilentDisengagement();
+  const headers=isReport?["Student","Cohort","SIS Fee Status","Last Login","Submissions","Quizzes","Engagement Status"]:["Student","Cohort","SIS Fee Status","Last Login","Submissions","Quizzes","Engagement Status","Action"];
+  const rows=list.map(s=>{
+    const base=[
+      esc(s.name),
+      `Year ${s.year}`,
+      `<span class="${s.feeStatus==="Cleared"?"lo":"med"}">${esc(s.feeStatus)}</span>`,
+      s.days===0?"Today":`${s.days}d ago`,
+      `${s.subCount}`,
+      `${s.quizCount}`,
+      `<span class="${s.severity}">${s.days>=14?"🔴 "+s.status:s.days>=7?"🟡 "+s.status:"🟢 "+s.status}</span>`
+    ];
+    if(!isReport)base.push(s.days>=7?`<button class="ghost sm" onclick="nudgeStudent('${esc(s.name)}',${s.days})">Send check-in</button>`:`<small>—</small>`);
+    return base;
+  });
+  return tbl(headers,rows);
+}
+
+function renderIntegrityTable(isReport=false){
+  const headers=isReport?["Case ID","Student","Unit","Flag Type","Evidence Summary","Severity","Status"]:["Case ID","Student","Unit","Flag Type","Evidence Summary","Severity","Status","Action"];
+  const rows=S.integrityFlags.map((f,idx)=>{
+    const sevCls=f.severity==="High"?"hi":f.severity==="Medium"?"med":"lo";
+    const base=[
+      `<b>${esc(f.id)}</b>`,
+      esc(f.student),
+      esc(f.unit),
+      esc(f.type),
+      `<small style="white-space:normal">${esc(f.detail)}</small>`,
+      `<span class="${sevCls}">${esc(f.severity)}</span>`,
+      `<span class="tag">${esc(f.status)}</span>`
+    ];
+    if(!isReport)base.push(f.status!=="Cleared"?`<button class="ghost sm" onclick="resolveIntegrityFlag(${idx},'Cleared')">Clear</button> <button class="sm" onclick="resolveIntegrityFlag(${idx},'Escalated to Senate')">Escalate</button>`:`<small>Resolved</small>`);
+    return base;
+  });
+  return tbl(headers,rows);
+}
+
+function buildRoleReport(){
+  const mine=myUnitIndices();
+  const dateStr=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+
+  if(S.role==="Student"){
+    const g=grade();
+    const avgAtt=mine.length?Math.round(mine.reduce((a,i)=>a+studentAttendancePct(S.user.name,i),0)/mine.length):100;
+    const totalLogged=myTasks().reduce((a,t)=>a+loggedHours(t),0);
+    const hrsLeft=pend().reduce((a,t)=>a+remHours(t),0);
+    const weeklyNet=DAYS.reduce((a,_,d)=>a+netFreeHoursForDay(d),0);
+    const unmastered=S.flashcards.filter(c=>mine.includes(c.c)&&!c.mastered?.[S.user.name]);
+    const weakTopics=[...new Set(unmastered.map(c=>`${S.units[c.c]?.code}: ${c.front}`))];
+    const unitRows=mine.map(i=>{
+      const s=ust(i), att=studentAttendancePct(S.user.name,i);
+      const uLogged=ofU(S.tasks,i).reduce((a,t)=>a+loggedHours(t),0);
+      const safeMisses=Math.max(0,Math.floor((att-75)/10));
+      const readiness=s.m!==null?(s.m>=70?"Strong ":s.m>=60?"On Track (2nd Upper)":"Needs Revision"):(s.qa!==null&&s.qa>=60?"On Track":"Pending Assessment");
+      return [U(i),`${att}% (${safeMisses} skip warnings)`,`${s.d}/${s.n} (${s.p}%)`,`${uLogged}h logged`,s.qa===null?"—":s.qa+"%",s.m===null?"—":s.m+"%",readiness];
+    });
+    const csvRows=[["Unit","Attendance & Buffer","Task Completion","Study Effort","Quiz Avg","Coursework Avg","Next-Semester Readiness"],...unitRows];
+    const html=`
+      <div class="report-head">
+        <div><b style="font-size:20px">🎓 Student Academic & Forward-Planning Report</b><br><small>Student: <b>${esc(S.user.name)}</b> (${esc(S.user.email)}) · Generated ${dateStr}</small></div>
+        <span class="tag">Target: First Class (70%+)</span>
+      </div>
+      <div class="grid">
+        <div class="card stat"><b>${g.avg}%</b>Current Weighted Avg</div>
+        <div class="card stat"><b>${g.need}%</b>Required on Remaining Work</div>
+        <div class="card stat"><b>${avgAtt}%</b>Overall Attendance</div>
+        <div class="card stat"><b>${hrsLeft}h / ${weeklyNet}h</b>Workload vs. Net Free Hrs</div>
+      </div>
+      <div class="report-sec">
+        <h4>1. Unit-by-Unit Performance, Attendance Safety Margin & Readiness</h4>
+        ${tbl(["Unit","Attendance & Skip warnings","Tasks Done","Study Effort","Quiz Avg","Marks So Far","Readiness level"],unitRows.map(r=>r.map(esc)))}
+      </div>
+      <div class="report-sec">
+        <h4>2. Revision Focus & Weakest Concept Heatmap</h4>
+        <div class="card">
+          <p style="margin:0 0 6px"><b>Concepts Flagged for Revision (${weakTopics.length} unmastered flashcards):</b></p>
+          ${weakTopics.length?`<ul style="margin:0;padding-left:18px">${weakTopics.map(w=>`<li>${esc(w)}</li>`).join("")}</ul>`:`<small>All unit flashcards mastered!</small>`}
+          <p style="margin:10px 0 0"><small><b>Portfolio & Study ROI:</b> ${totalLogged}h total study logged across ${mine.length} active units (${pct()}% completion rate).</small></p>
+        </div>
+      </div>`;
+    return{title:"Student Academic & Forward-Planning Report",csv:csvRows,html};
+  }
+
+  if(S.role==="Instructor"){
+    const riskList=computeAtRiskStudents();
+    const ungraded=ungradedCount();
+    const openThreads=S.th.filter(t=>mine.includes(t.c)&&!t.ans).length;
+    const unitRows=mine.map(i=>{
+      const u=S.units[i], asgs=S.tasks.filter(t=>t.a&&t.c===i), tot=asgs.length*stu(i);
+      const sub=asgs.reduce((a,t)=>a+Object.keys(t.subs||{}).length,0);
+      const subPct=tot?Math.round(sub/tot*100):0;
+      const allScores=ofU(S.quizzes,i).flatMap(q=>Object.values(q.attempts||{}).flat().map(a=>a.score));
+      const qAvg=allScores.length?Math.round(allScores.reduce((a,b)=>a+b,0)/allScores.length)+"%":"—";
+      const avgUnitAtt=u.students.length?Math.round(u.students.reduce((a,st)=>a+studentAttendancePct(st,i),0)/u.students.length):100;
+      const topRes=ofU(S.res,i).sort((a,b)=>(b.views||0)-(a.views||0))[0];
+      const uRisks=riskList.filter(r=>r.unit.startsWith(u.code)).length;
+      return [U(i),`${stu(i)} students`,`${avgUnitAtt}%`,`${subPct}%`,qAvg,topRes?`${topRes.t} (${topRes.views||0} views)`:"—",`${uRisks} flagged`];
+    });
+    const csvRows=[["Unit","Cohort Size","Mean Attendance","Submission Rate","Quiz Mean","Most Used Resource","At-Risk Count"],...unitRows];
+    const html=`
+      <div class="report-head">
+        <div><b style="font-size:20px">📋 Instructor Teaching Analytics & Intervention Report</b><br><small>Lecturer: <b>${esc(S.user.name)}</b> · Generated ${dateStr}</small></div>
+        <span class="tag">${mine.length} Assigned Units</span>
+      </div>
+      <div class="grid">
+        <div class="card stat"><b>${riskList.length}</b>At-Risk Students Flagged</div>
+        <div class="card stat"><b>${ungraded}</b>Scripts Awaiting Grading</div>
+        <div class="card stat"><b>${openThreads}</b>Unanswered Forum Threads</div>
+        <div class="card stat"><b>${mine.reduce((a,i)=>a+stu(i),0)}</b>Total Student Seats</div>
+      </div>
+      <div class="report-sec">
+        <h4>1. Unit Engagement, Resource Utilization & Assessment Summary</h4>
+        ${tbl(["Unit","Cohort","Mean Attendance","Submissions","Quiz Avg","Top Accessed Resource","At-Risk Alerts"],unitRows.map(r=>r.map(esc)))}
+      </div>
+      <div class="report-sec">
+        <h4>2. Priority Early-Alert Intervention & Exam Eligibility Defaulter Roster</h4>
+        ${riskList.length?tbl(["Student","Unit","Attendance","Quiz Avg","Action Required"],riskList.map(r=>[esc(r.student),esc(r.unit),`<span class="${r.attPct<75?"hi":"lo"}">${r.attPct}%</span>`,esc(r.qAvg),`<span class="hi">${esc(r.reasons)}</span>`])):`<div class="card"><small>All students currently meet attendance and coursework thresholds.</small></div>`}
+      </div>`;
+    return{title:"Instructor Teaching Analytics & Intervention Report",csv:csvRows,html};
+  }
+
+  const ghosts=computeGhostCourses().filter(g=>g.status==="Ghost Course");
+  const dormant=computeSilentDisengagement().filter(s=>s.days>=14);
+  const openFlags=S.integrityFlags.filter(f=>f.status!=="Cleared");
+  const csvRows=[
+    ["Section","Item","Metric / Detail","Status"],
+    ...computeCohortFunnel().map(c=>["Cohort Progression",c.year,`Retained: ${c.retained}/${c.enrolled} (${c.retentionPct}%) | Transfers: ${c.transfersOut} | Dropouts: ${c.dropouts}`,`-${c.attritionPct}% attrition`]),
+    ...computeGhostCourses().map(g=>["Ghost Course Detector",`${g.code} (${g.ins})`,`Last login: ${g.lastLoginDays}d ago | ${g.resCount} resources`,g.status]),
+    ...computeSilentDisengagement().map(s=>["Silent Disengagement",s.name,`Last login: ${s.days}d ago | SIS: ${s.feeStatus} | ${s.subCount} submissions`,s.status]),
+    ...S.integrityFlags.map(f=>["Academic Integrity",`${f.id}: ${f.student} (${f.unit})`,f.type,f.status])
+  ];
+  const html=`
+    <div class="report-head">
+      <div><b style="font-size:20px">🏛️ Institutional Governance, Retention & Quality Assurance Report</b><br><small>Prepared by: <b>${esc(S.user.name)}</b> · Generated ${dateStr}</small></div>
+      <span class="tag">Senate & CUE Audit Ready</span>
+    </div>
+    <div class="grid">
+      <div class="card stat"><b>${ghosts.length}</b>Ghost Courses (14d+ Inactive)</div>
+      <div class="card stat"><b>${dormant.length}</b>Dormant Students (14d+ Zero Login)</div>
+      <div class="card stat"><b>${openFlags.length}</b>Open Integrity Flags</div>
+      <div class="card stat"><b>${Math.round(S.cohorts[3].retained/S.cohorts[0].enrolled*100)}%</b>Y1 → Y4 Cohort Progression</div>
+    </div>
+    <div class="report-sec">
+      <h4>1. Cohort Progression & Transfer Funnel (Year 1 → Year 4)</h4>
+      ${renderCohortFunnelCard(true)}
+    </div>
+    <div class="report-sec">
+      <h4>2. Lecturer Activity & "Ghost Course" Detector</h4>
+      ${renderGhostCoursesTable(true)}
+    </div>
+    <div class="report-sec">
+      <h4>3. Silent Disengagement / Zero-Login Early Alert</h4>
+      ${renderSilentDisengagementTable(true)}
+    </div>
+    <div class="report-sec">
+      <h4>4. Academic Integrity & Plagiarism Flag Log</h4>
+      ${renderIntegrityTable(true)}
+    </div>`;
+  return{title:"Institutional Governance, Retention & Quality Assurance Report",csv:csvRows,html};
+}
+
+function downloadCSV(){
+  const rep=buildRoleReport();
+  const csv=rep.csv.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`studyhub_${S.role.toLowerCase()}_governance_report.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("CSV report downloaded");
+}
+
+function printReport(){
+  S.repPreview=true;R();
+  setTimeout(()=>window.print(),120);
+}
+
+const V={
+  dash(){
+    const n=pend().slice(0,3),a=S.msgs[0],mine=myUnitIndices();
+    const todayName=DAYS[(new Date().getDay()+6)%7];
+    const todayClasses=S.timetable.filter(s=>s.day===todayName && mine.includes(s.c));
+
+    if(S.role=="Instructor"){
+      const myStu=new Set(mine.flatMap(i=>S.units[i].students)).size, toMark=ungradedCount(), atRisk=computeAtRiskStudents().length;
+      return H("Instructor dashboard","Objectives 1, 5 and 6")+`<div class="grid"><div class="card stat"><b>${mine.length}</b>Units assigned</div><div class="card stat"><b>${myStu}</b>Unique students</div><div class="card stat"><b>${toMark}</b>Assignments to mark</div><div class="card stat"><b>${atRisk}</b>At-risk alerts</div></div><div class="card"><b>Latest announcement</b><p>${esc(a.t)}</p></div><button onclick="S.view='res';R()">Open my units (Weeks & Topics)</button> <button class="ghost" onclick="S.view='rep';R()">Preview & print report</button>`;
+    }
+    if(S.role=="Administrator"){
+      const ghosts=computeGhostCourses().filter(g=>g.status==="Ghost Course").length;
+      const dormant=computeSilentDisengagement().filter(s=>s.days>=14).length;
+      const openFlags=S.integrityFlags.filter(f=>f.status!=="Cleared").length;
+      return H("Administrator Executive Dashboard","Institutional Governance, Retention & Compliance")+
+      `<div class="grid">
+        <div class="card stat"><b>${ghosts}</b>Ghost Courses Flagged</div>
+        <div class="card stat"><b>${dormant}</b>Dormant Students (14d+)</div>
+        <div class="card stat"><b>${openFlags}</b>Open Integrity Flags</div>
+        <div class="card stat"><b>${Math.round(S.cohorts[3].retained/S.cohorts[0].enrolled*100)}%</b>Y1→Y4 Cohort Survival</div>
+      </div>`+
+      renderCohortFunnelCard(false)+
+      `<div class="row">
+        <button onclick="S.view='gov';R()">Open Governance & Early-Alert Center</button>
+        <button class="ghost" onclick="S.view='usr';R()">Manage users & units</button>
+        <button class="ghost" onclick="S.view='rep';R()">Preview & print institutional report</button>
+      </div>`;
+    }
+    const hrsLeft=pend().reduce((acc,t)=>acc+remHours(t),0);
+    return H("Welcome back, "+esc(S.user.name.split(" ")[0]),"")+
+    `<div class="grid"><div class="card stat"><b>${pend().length}</b>Tasks pending (${hrsLeft}h left)</div><div class="card stat"><b>${pct()}%</b>Tasks completed</div><div class="card stat"><b>${grade().avg}%</b>Average mark so far</div></div>`+
+    `<div class="card"><b>Today's Timetable (${todayName})</b>${todayClasses.length?todayClasses.map(s=>`<div class="item"><div><b>${esc(U(s.c))}</b><br><small>${esc(s.venue)} · ${esc(s.type)}</small></div><span class="tag">${esc(s.time)}</span></div>`).join(""):"<p><small>No scheduled lectures today — full study capacity available.</small></p>"}</div>`+
+    `<div class="card"><b>Next deadlines</b>${n.map(t=>`<div class="item"><div>${esc(t.t)}<br><small>${esc(U(t.c))} · due ${fd(D(t.d))} · ${loggedHours(t)}/${t.h||1}h studied</small></div><span class="${pr(t)[1][1]}">${pr(t)[1][0]}</span></div>`).join("")||"<small>No pending deadlines.</small>"}</div>`+
+    `<div class="card"><b>Announcement</b><p>${esc(a.t)}</p><small>${esc(a.f)}</small></div>`+
+    `<button onclick="S.view='res';R()">Open my units (Weeks & Topics)</button> <button class="ghost" onclick="S.view='plan';R()">Study planner & Focus</button>`;
+  },
+  gov(){
+    return H("Institutional Governance & Early-Alert Center","Cohort Progression · Ghost Courses · Silent Disengagement · Academic Integrity")+
+    `<h3 style="margin:12px 0 8px">1. Cohort Progression & Transfer Funnel (Year 1 → Year 4)</h3>`+
+    renderCohortFunnelCard(false)+
+    `<h3 style="margin:16px 0 8px">2. Lecturer Activity & "Ghost Course" Detector</h3>`+
+    renderGhostCoursesTable(false)+
+    `<h3 style="margin:16px 0 8px">3. Silent Disengagement / Zero-Login Early Alert (14+ Days)</h3>`+
+    renderSilentDisengagementTable(false)+
+    `<h3 style="margin:16px 0 8px">4. Academic Integrity & Plagiarism Flag Log</h3>`+
+    renderIntegrityTable(false);
+  },
+  res(){return unitView("modules","My units","Objective 1 · Weekly syllabus topics, slides, quizzes & discussions")},
+  quiz(){return unitView("quiz","Quizzes by unit & topic"," Topic-aligned timed quizzes with auto-marking")},
+  disc(){return unitView("disc","Discussions by unit & topic","Objective 5 · Topic-organized course discussion boards")},
+  time(){
+    const mine=myUnitIndices();
+    const classSlots=S.timetable.map((s,idx)=>({s,idx})).filter(({s})=>mine.includes(s.c));
+    const quizSlots=S.quizzes.map((q,idx)=>({q,idx})).filter(({q})=>mine.includes(q.c));
+
+    // Build day-indexed study plan map (fallback to default balanced preview if not generated yet)
+    const studyByDay={};
+    DAYS.forEach(d=>studyByDay[d]=[]);
+    if(S.plan?.days){
+      S.plan.days.forEach(dObj=>{
+        const dayName=DAYS[dObj.dow];
+        dObj.it.forEach(item=>{
+          const t=S.tasks[item.idx];
+          if(t)studyByDay[dayName].push({task:t,hours:item.hours});
+        });
+      });
+    }
+
+    const adminControls=S.role!=="Student"?`<div class="card">
+      <b>Schedule Class or Set Quiz on Weekly Timetable</b>
+      <div class="row" style="margin-top:8px">
+        <select id="tc">${mine.map(i=>`<option value="${i}">${esc(S.units[i].code)}</option>`).join("")}</select>
+        <select id="tday">${DAYS.map(d=>`<option>${d}</option>`).join("")}</select>
+        <input id="ttime" placeholder="Time (e.g. 10:00 – 12:00)" style="width:165px">
+        <input id="tvenue" placeholder="Venue / Lab" style="flex:1">
+        <select id="ttype"><option>Lecture</option><option>Practical Lab</option><option>Tutorial</option></select>
+        <button class="sm" onclick="addTimetableSlot()">+ Class slot</button>
+      </div>
+      <div class="row" style="margin-bottom:0">
+        <select id="tq_sel" style="flex:2">${quizSlots.map(({q,idx})=>`<option value="${idx}">${esc(S.units[q.c]?.code)} — ${esc(q.t)} (${q.day||"Unscheduled"})</option>`).join("")}</select>
+        <select id="tq_day">${DAYS.map(d=>`<option>${d}</option>`).join("")}</select>
+        <input id="tq_time" value="14:00" placeholder="Quiz time" style="width:110px">
+        <button class="ghost sm" onclick="scheduleQuizSlot()">Set Quiz Day</button>
+      </div>
+    </div>`:"";
+
+    const studyBanner=S.role==="Student"?`<div class="row" style="justify-content:space-between">
+      <small>Showing weekly <b>Classes</b>, <b>Set Quizzes</b>, and <b>Study Time</b>${S.plan?" (synced with your Study Planner)":" (click Generate Study Blocks to populate your personalized study slots)"}.</small>
+      <button class="ghost sm" onclick="computePlan(false)">${S.plan?"Re-balance Study Time":"Generate Study Time Blocks"}</button>
+    </div>`:"";
+
+    const classesRow=`<tr>
+      <td>🏫 <b>Classes</b><br><small>Lectures & Labs</small></td>
+      ${DAYS.map(day=>{
+        const items=classSlots.filter(({s})=>s.day===day);
+        return `<td>${items.length?items.map(({s,idx})=>`<div class="tt-slot">
+          <div class="row" style="justify-content:space-between;margin:0">
+            <b>${esc(S.units[s.c]?.code)}</b>
+            ${S.role!=="Student"?`<button class="link" style="font-size:12px" onclick="S.timetable.splice(${idx},1);R()">×</button>`:""}
+          </div>
+          <small>${esc(s.time)}<br>${esc(s.venue)} (${esc(s.type)})</small>
+        </div>`).join(""):"<small>No classes</small>"}</td>`;
+      }).join("")}
+    </tr>`;
+
+    const quizzesRow=`<tr>
+      <td>📝 <b>Set Quizzes</b><br><small>Timed Assessments</small></td>
+      ${DAYS.map(day=>{
+        const items=quizSlots.filter(({q})=>q.day===day);
+        return `<td>${items.length?items.map(({q,idx})=>`<div class="tt-slot quiz">
+          <b>${esc(S.units[q.c]?.code)}</b>: ${esc(q.t)}<br>
+          <small>⏰ ${esc(q.time||"All day")} · ${q.mins||10} mins</small>
+          ${S.role==="Student"?`<div style="margin-top:4px"><button class="sm" style="padding:2px 8px;min-height:26px;font-size:11.5px" onclick="S.view='quiz';openU(${q.c},'quiz');startQuiz(${idx})">Take Quiz</button></div>`:""}
+        </div>`).join(""):"<small>No quizzes</small>"}</td>`;
+      }).join("")}
+    </tr>`;
+
+    const studyRow=`<tr>
+      <td>📖 <b>Study Time</b><br><small>${S.role==="Student"?"Planned & Free Hrs":"Recommended Prep"}</small></td>
+      ${DAYS.map((day,dIdx)=>{
+        const net=netFreeHoursForDay(dIdx);
+        const blocks=studyByDay[day]||[];
+        if(S.role!=="Student"){
+          const unitCodes=[...new Set(classSlots.filter(({s})=>s.day===day).map(({s})=>S.units[s.c]?.code))];
+          return `<td><div class="tt-slot study"><small>${unitCodes.length?`Office hours / prep for <b>${unitCodes.join(", ")}</b>`:"Research & grading block"}</small></div></td>`;
+        }
+        return `<td>
+          ${blocks.length?blocks.map(b=>`<div class="tt-slot study">
+            <b>${esc(S.units[b.task.c]?.code)}</b>: ${esc(b.task.t)}<br>
+            <small>⏱ ${b.hours}h study block</small>
+          </div>`).join(""):""}
+          <small>${net}h net free capacity</small>
+        </td>`;
+      }).join("")}
+    </tr>`;
+
+    return H("Weekly Master Timetable","Classes, Set Quizzes, and Study Time in one unified schedule")+
+    adminControls+
+    studyBanner+
+    `<div class="card">
+      <table class="tt-table">
+        <thead>
+          <tr>
+            <th>Schedule Type</th>
+            ${DAYS.map((d,idx)=>`<th>${d}<br><small style="font-weight:400">${lectureHoursForDay(idx)}h class</small></th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${classesRow}
+          ${quizzesRow}
+          ${studyRow}
+        </tbody>
+      </table>
+    </div>`;
+  },
+  tasks(){
+    const mine=myUnitIndices(), all=[...pend(),...myTasks().filter(t=>taskForMe(t).done)];
+    return H("Tasks and deadlines"," Task manager with effort tracking")+`<div class="card"><div class="row"><input id="nt" placeholder="New task" style="flex:1"><select id="nc">${mine.map(i=>`<option value=${i}>${esc(S.units[i].code)}</option>`).join("")}</select><input id="nd" type="date"><input id="nw" type="number" min="1" max="100" placeholder="Weight %" style="width:105px"><input id="nh" type="number" min="1" max="40" placeholder="Est. hrs" style="width:95px"><button onclick="addTask()">Add</button></div><small>Priority = grade weight ÷ days remaining. Effort estimates feed directly into your Study Planner.</small></div><div class="card">${all.map(t=>{
+      const me=taskForMe(t),idx=S.tasks.indexOf(t),p=Math.min(100,Math.round(me.lh/me.est*100));
+      return `<div class="item">
+        <label class="${me.done?"done":""}" style="flex:1">
+          <input type="checkbox" ${me.done?"checked":""} ${t.a?"disabled":""} onchange="S.tasks[${idx}].done=this.checked?1:0;if(S.plan)computePlan(true);else R()"> ${esc(t.t)}<br>
+          <small>${esc(U(t.c))} · due ${fd(D(t.d))} · ${t.w}% · <span class="bar sm"><i style="width:${p}%"></i></span>${me.lh}/${me.est}h studied${t.a?" · "+me.status:""}</small>
+        </label>
+        <div class="row" style="margin:0">
+          ${!me.done?`<button class="ghost sm" onclick="logStudyHour(${idx},1)">+1h</button>`:""}
+          ${t.a&&!me.done?`<button class="ghost sm" onclick="S.view='res';openU(${t.c},'assign')">Submit</button>`:`<span class="${me.done?"lo":pr(t)[1][1]}">${me.done?(me.mark!==null?me.mark+"%":"Done"):pr(t)[1][0]}</span>`}
+        </div>
+      </div>`;
+    }).join("")||"<small>No tasks for your enrolled units.</small>"}</div>`;
+  },
+  plan(){
+    const pendingList=pend();
+    const weeklyNet=DAYS.reduce((a,_,i)=>a+netFreeHoursForDay(i),0);
+    const needed=pendingList.reduce((a,t)=>a+remHours(t),0);
+    const activeFocusIdx=S.pomo.taskIdx!==null?S.pomo.taskIdx:(pendingList[0]?S.tasks.indexOf(pendingList[0]):null);
+
+    return H("Study planner & Focus timer"," Timetable-aware schedule & Focus sessions")+
+    `<div class="pomo">
+      <div>
+        <small><b> FOCUS TIMER (25 MIN)</b></small>
+        <div id="pomoclock" class="pomo-clock">${fmtSec(S.pomo.rem)}</div>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <small>Focus task (+0.5h auto-logged on completion):</small>
+        <select style="width:100%;margin-top:4px;min-height:38px" onchange="S.pomo.taskIdx=+this.value">
+          ${pendingList.map(t=>{const k=S.tasks.indexOf(t);return `<option value="${k}" ${activeFocusIdx===k?"selected":""}>${esc(S.units[t.c]?.code)} — ${esc(t.t)} (${remHours(t)}h left)</option>`}).join("")||`<option value="">All tasks completed!</option>`}
+        </select>
+      </div>
+      <div class="row" style="margin:0">
+        <button class="sm" onclick="togglePomo()">${S.pomo.running?"Pause":"Start focus"}</button>
+        <button class="ghost sm" onclick="resetPomo()">Reset</button>
+        <button class="ghost sm" onclick="completePomoSession()">Finish & log +0.5h</button>
+      </div>
+    </div>`+
+
+    `<div class="card">
+      <div class="row" style="justify-content:space-between"><b>Daily study budget (after subtracting timetable lectures)</b><small>Net weekly capacity: <b>${weeklyNet}h</b> · Pending workload: <b>${needed}h</b></small></div>
+      <div class="row">${DAYS.map((day,i)=>{
+        const lec=lectureHoursForDay(i), net=netFreeHoursForDay(i);
+        return `<label style="min-width:78px">${day} <small>(-${lec}h lec)</small><br><input type="number" min="0" max="14" value="${S.av[i]}" style="width:68px" onchange="S.av[${i}]=Math.max(0,+this.value||0);if(S.plan)computePlan(true);else R()"><br><small>Net: <b>${net}h</b></small></label>`;
+      }).join("")}</div>
+      <button onclick="computePlan(false)">Generate / Re-balance plan</button>
+    </div>`+
+    (S.plan?.warnings?.length?`<div class="alert"><b>⚠️ Schedule Overload Warnings</b><ul style="margin:6px 0 0;padding-left:18px">${S.plan.warnings.map(w=>`<li><small style="color:var(--ink)">${esc(w)}</small></li>`).join("")}</ul></div>`:"")+
+    (S.plan?S.plan.days.map(d=>`<div class="card"><b>${new Date(d.d).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})}</b> <small>(${d.lecHrs}h lectures · ${netFreeHoursForDay(d.dow)}h net study capacity)</small>${d.it.length?d.it.map(item=>{
+      const t=S.tasks[item.idx];
+      if(!t)return "";
+      const lh=loggedHours(t), est=t.h||1;
+      return `<div class="item">
+        <div><b>${esc(t.t)}</b><br><small>${esc(U(t.c))} · Progress: ${lh}/${est}h studied</small></div>
+        <div class="row" style="margin:0">
+          <span class="tag">${item.hours} h planned</span>
+          ${!taskForMe(t).done?`<button class="ghost sm" onclick="logStudyHour(${item.idx},1)">Log 1h studied</button>`:`<span class="lo">Done</span>`}
+        </div>
+      </div>`;
+    }).join(""):"<div><small>Rest day or classes only</small></div>"}</div>`).join(""):"<small>Click Generate to build a weekly study plan around your class timetable.</small>");
+  },
+  prog(){
+    const g=grade(),mine=myUnitIndices();
+    const ungraded=myTasks().filter(t=>taskForMe(t).mark===null);
+    let gradedW=0, gradedMW=0;
+    myTasks().forEach(t=>{const m=taskForMe(t).mark;if(m!==null){gradedW+=t.w;gradedMW+=m*t.w}});
+    let simW=gradedW, simMW=gradedMW;
+    ungraded.forEach((t,idx)=>{
+      const val=S.simMarks[idx]!==undefined?S.simMarks[idx]:70;
+      simW+=t.w;simMW+=val*t.w;
+    });
+    const finalExamW=Math.max(0,100-simW);
+    const examSim=S.simMarks["exam"]!==undefined?S.simMarks["exam"]:70;
+    const projected=Math.round((simMW+examSim*finalExamW)/100);
+    const honours=projected>=70?"First Class Honours (70%+)":projected>=60?"Second Class Upper (60–69%)":projected>=50?"Second Class Lower (50–59%)":"Pass (40–49%)";
+
+    return H("Progress & Grade Simulator"," Progress dashboard & What-If calculator")+
+    `<div class="grid"><div class="card stat"><b>${pct()}%</b>All tasks completed</div><div class="card stat"><b>${g.avg}%</b>Current graded average</div><div class="card stat"><b>${g.need}%</b>Needed on remaining work for 70%</div></div>`+
+    `<div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div><b>🎯 Interactive "What-If" Grade Simulator</b><br><small>Drag sliders to test target scores on remaining coursework and final exams</small></div>
+        <div style="text-align:right"><b style="font-size:22px;color:var(--pri)">${projected}%</b><br><span class="${projected>=70?"lo":projected>=60?"med":"hi"}">${honours}</span></div>
+      </div>
+      ${ungraded.map((t,idx)=>{
+        const val=S.simMarks[idx]!==undefined?S.simMarks[idx]:70;
+        return `<div class="item">
+          <div style="flex:1"><b>${esc(t.t)}</b> <small>(${esc(S.units[t.c]?.code)} · Weight ${t.w}%)</small></div>
+          <input type="range" min="0" max="100" value="${val}" oninput="S.simMarks[${idx}]=+this.value;R()">
+          <b style="width:44px;text-align:right">${val}%</b>
+        </div>`;
+      }).join("")}
+      ${finalExamW>0?`<div class="item">
+        <div style="flex:1"><b>Final End-of-Semester Exams</b> <small>(Remaining weight ${finalExamW}%)</small></div>
+        <input type="range" min="0" max="100" value="${examSim}" oninput="S.simMarks['exam']=+this.value;R()">
+        <b style="width:44px;text-align:right">${examSim}%</b>
+      </div>`:""}
+    </div>`+
+    `<div class="grid">${mine.map(i=>{const u=S.units[i],s=ust(i),att=studentAttendancePct(S.user.name,i);return `<div class="card"><b>${esc(u.code)}</b> <small>${esc(u.name)}</small><p>Tasks done: ${s.d} of ${s.n} · Attendance: <b>${att}%</b></p><div class="bar"><i style="width:${s.p}%"></i></div><p>Quiz average: ${s.qa===null?"none yet":s.qa+"%"}<br>Marks so far: ${s.m===null?"none yet":s.m+"%"}</p></div>`}).join("")}</div>`;
+  },
+  att(){
+    const mine=myUnitIndices();
+    return H("Lecture Attendance Roll Call","Feeds directly into Class Progress early-alert risk detection")+
+    `<div class="card">
+      <b>Record new session attendance</b>
+      <div class="row" style="margin-top:8px">
+        <select id="att_u">${mine.map(i=>`<option value="${i}">${esc(S.units[i].code)} — ${esc(S.units[i].name)}</option>`).join("")}</select>
+        <input id="att_label" placeholder="Session label (e.g. Week 6 – Mon Lecture)" style="flex:1">
+        <button class="sm" onclick="createAttendanceSession()">Start roll call</button>
+      </div>
+    </div>`+
+    S.attendance.map((ses,sIdx)=>({ses,sIdx})).filter(({ses})=>mine.includes(ses.c)).map(({ses,sIdx})=>`<div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px">
+        <div><b>${esc(U(ses.c))}</b> · <span class="tag">${esc(ses.date)}</span></div>
+        <button class="ghost sm" onclick="S.attendance.splice(${sIdx},1);R()">Delete</button>
+      </div>
+      ${S.units[ses.c].students.map(stName=>{
+        const cur=ses.records[stName]||"Present";
+        return `<div class="item" style="padding:6px 0">
+          <span>${esc(stName)}</span>
+          <div class="row" style="margin:0">
+            ${["Present","Late","Absent"].map(st=>`<button class="pill ${cur===st?"":"ghost"}" onclick="S.attendance[${sIdx}].records['${esc(stName)}']='${st}';R()">${st}</button>`).join("")}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>`).join("");
+  },
+  cls(){
+    const mine=myUnitIndices(), riskList=computeAtRiskStudents();
+    return H("Class progress by unit","Objective 6 · Live analytics & early-alert risk detection")+`<div class="grid">${mine.map(i=>{
+      const u=S.units[i],asgs=S.tasks.filter(t=>t.a&&t.c===i),totSlots=asgs.length*stu(i);
+      const subSlots=asgs.reduce((acc,t)=>acc+Object.keys(t.subs||{}).length,0);
+      const subPct=totSlots?Math.round(subSlots/totSlots*100):0;
+      const allScores=ofU(S.quizzes,i).flatMap(q=>Object.values(q.attempts||{}).flat().map(a=>a.score));
+      const qAvg=allScores.length?Math.round(allScores.reduce((a,b)=>a+b,0)/allScores.length):0;
+      const unitRisks=riskList.filter(r=>r.unit.startsWith(u.code)).length;
+      return `<div class="card"><b>${esc(u.code)}</b> <small>${esc(u.name)}</small><p>${stu(i)} students<br>Assignments submitted: ${subPct}%</p><div class="bar"><i style="width:${subPct}%"></i></div><p>Class quiz average: ${qAvg}%<br><span class="${unitRisks?"hi":"lo"}">${unitRisks} student${unitRisks===1?"":"s"} flagged for support</span></p></div>`;
+    }).join("")}</div>
+    <b>Students needing support (auto-detected from attendance, quiz scores & missing work)</b>`+
+    (riskList.length?tbl(["Student","Unit","Attendance","Quiz Avg","Risk Factors"],riskList.map(r=>[esc(r.student),esc(r.unit),`<span class="${r.attPct<75?"hi":"lo"}">${r.attPct}%</span>`,esc(r.qAvg),`<span class="hi">${esc(r.reasons)}</span>`])):`<div class="card"><small>No students currently flagged at risk across your units.</small></div>`);
+  },
+  msgs(){
+    const st=S.role=="Student",mine=myUnitIndices();
+    return H("Messages and announcements"," Announcements and messages")+`<div class="card">${S.msgs.map(m=>`<div class="item"><div>${esc(m.t)}<br><small>${esc(m.f)} · ${esc(U(m.c))}</small></div></div>`).join("")}</div><div class="card"><div class="row"><select id="mu">${mine.map(i=>`<option value=${i}>${esc(S.units[i].code)}</option>`).join("")}</select><input id="mt" placeholder="${st?"Message your instructor":"Write an announcement"}" style="flex:1"><button onclick="postMessage()">${st?"Send":"Post"}</button></div></div>`;
+  },
+  usr(){
+    const instructors=allInstructors(),students=allStudents();
+    return H("Users and units","Objective 1 · Unit creation, instructor assignment & student enrollment")+
+    `<div class="card">
+      <b>1. Create a new unit & assign instructor</b>
+      <div class="row" style="margin-top:8px">
+        <input id="ucode" placeholder="Unit code (e.g. CSC 315)" style="width:170px">
+        <input id="uname" placeholder="Unit title (e.g. Operating Systems)" style="flex:1">
+        <select id="uins">${instructors.map(ins=>`<option value="${esc(ins.n)}">${esc(ins.n)}</option>`).join("")}</select>
+        <button onclick="addUnit()">Create unit</button>
+      </div>
+    </div>`+
+    `<h3 style="margin:16px 0 8px">2. Unit Rosters & Instructor Assignments</h3>`+
+    S.units.map((u,i)=>{
+      const unenrolled=students.filter(s=>!u.students.includes(s.n));
+      return `<div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:6px">
+          <div><b style="font-size:16px">${esc(u.code)} — ${esc(u.name)}</b><br><small>${stu(i)} enrolled students</small></div>
+          <div class="row" style="margin:0">
+            <small>Instructor:</small>
+            <select style="min-height:36px;padding:4px 8px" onchange="assignInstructor(${i}, this.value)">
+              ${instructors.map(ins=>`<option value="${esc(ins.n)}" ${u.ins===ins.n?"selected":""}>${esc(ins.n)}</option>`).join("")}
+            </select>
+            <button class="ghost sm" onclick="deleteUnit(${i})">Delete unit</button>
+          </div>
+        </div>
+        <div class="chips">
+          ${u.students.map(st=>`<span class="tag">${esc(st)} <button title="Unenroll student" onclick="unenrollStudent(${i}, '${esc(st)}')">×</button></span>`).join("")||"<small>No students enrolled yet.</small>"}
+        </div>
+        ${unenrolled.length?`<div class="row" style="margin-top:10px;margin-bottom:0">
+          <select id="enr_${i}" style="min-height:38px;padding:6px 10px;flex:1">
+            ${unenrolled.map(s=>`<option value="${esc(s.n)}">${esc(s.n)} (${esc(s.e)})</option>`).join("")}
+          </select>
+          <button class="sm" onclick="enrollStudent(${i}, $('#enr_${i}').value)">+ Enroll student</button>
+        </div>`:`<small>All registered students are enrolled in this unit.</small>`}
+      </div>`;
+    }).join("")+
+    `<h3 style="margin:16px 0 8px">3. User Accounts</h3>
+    <div class="card">
+      <div class="row">
+        <input id="un" placeholder="Full name" style="flex:1">
+        <input id="ue" type="email" placeholder="Email (e.g. jane@university.ac.ke)" style="flex:1">
+        <select id="ur"><option>Student</option><option>Instructor</option><option>Administrator</option></select>
+        <button onclick="adminAddUser()">Add user</button>
+      </div>
+      <table>
+        <tr><th>Name</th><th>Email</th><th>Role</th><th>Last Login</th><th>Enrolled / Assigned Units</th></tr>
+        ${S.acc.map(a=>{
+          const count=a.r==="Student"?S.units.filter(u=>u.students.includes(a.n)).length:a.r==="Instructor"?S.units.filter(u=>u.ins===a.n).length:"All";
+          return `<tr><td>${esc(a.n)}</td><td>${esc(a.e)}</td><td><span class="tag">${esc(a.r)}</span></td><td>${a.lastLoginDays===0?"Today":a.lastLoginDays+"d ago"}</td><td>${count}</td></tr>`;
+        }).join("")}
+      </table>
+    </div>`;
+  },
+  rep(){
+    const rep=buildRoleReport();
+    return `<div class="no-print">
+      ${H("Forward-Looking Reports & Print Preview","Objective 6 · Predictive analytics, on-screen preview & print/PDF export")}
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:0">
+          <div class="row" style="margin:0">
+            <button class="pill ${S.repPreview?"":"ghost"}" onclick="S.repPreview=!S.repPreview;R()">${S.repPreview?"👁️ Hide On-Screen Preview":"👁️ Preview Report on Screen"}</button>
+            <button class="ghost sm" onclick="downloadCSV()">📥 Export CSV</button>
+          </div>
+          <button onclick="printReport()">🖨️ Print / Save Report as PDF</button>
+        </div>
+      </div>
+    </div>`+
+    (S.repPreview?`<div class="report-sheet">${rep.html}</div>`:`<div class="card"><small>Click "Preview Report on Screen" above to inspect the full formatted report before printing.</small></div>`);
+  }
+};
+
+// Governance & Early-Alert Actions
+function nudgeInstructor(insName,unitCode){
+  pushNotif(insName,`Admin Notice: Please log in to ${unitCode}, upload Week 1–2 learning resources, and post a welcome announcement.`);
+  R();toast(`Nudge sent to ${insName} for ${unitCode}`);
+}
+function nudgeStudent(stName,days){
+  pushNotif(stName,`Academic Advising Check-In: We noticed you haven't logged into StudyHub for ${days} days. Reach out if you need support.`);
+  R();toast(`Support check-in sent to ${stName}`);
+}
+function resolveIntegrityFlag(idx,newStatus){
+  S.integrityFlags[idx].status=newStatus;
+  R();toast(`Case ${S.integrityFlags[idx].id} marked as ${newStatus}`);
+}
+
+// Flashcard, Study Group, Timetable & Attendance Actions
+function setCardMastery(cardIdx,val){
+  const c=S.flashcards[cardIdx];
+  c.mastered=c.mastered||{};
+  c.mastered[S.user.name]=val;
+  S.fcFlip=false;R();
+  toast(val?"Marked as mastered":"Marked for review");
+}
+function addFlashcard(unitIdx){
+  const front=$("#fcf").value.trim(), back=$("#fcb").value.trim();
+  if(!front||!back)return toast("Fill in both the front and back of the flashcard");
+  S.flashcards.push({c:unitIdx,front,back,mastered:{}});
+  R();toast("Flashcard added to deck");
+}
+function createGroup(unitIdx){
+  const name=$("#gname").value.trim(), topic=$("#gtopic").value.trim()||"General unit revision";
+  if(!name)return toast("Enter a group name");
+  S.groups.unshift({c:unitIdx,name,topic,members:[S.user.name],goal:topic,notes:[`${S.user.name}: Created study group.`]});
+  R();toast(`Created study group "${name}"`);
+}
+function joinGroup(gIdx){const g=S.groups[gIdx];if(!g.members.includes(S.user.name))g.members.push(S.user.name);R();toast(`Joined ${g.name}`)}
+function leaveGroup(gIdx){const g=S.groups[gIdx];g.members=g.members.filter(m=>m!==S.user.name);R();toast(`Left ${g.name}`)}
+function postGroupNote(gIdx){const txt=$("#gnote_"+gIdx).value.trim();if(!txt)return toast("Write a note first");S.groups[gIdx].notes.push(`${S.user.name}: ${txt}`);R();toast("Note posted to group")}
+function addTimetableSlot(){
+  const c=+$("#tc").value, day=$("#tday").value, time=$("#ttime").value.trim()||"10:00 – 12:00", venue=$("#tvenue").value.trim()||"Main Hall", type=$("#ttype").value;
+  S.timetable.push({c,day,time,hrs:2,venue,type});
+  if(S.plan)computePlan(true);else R();
+  toast("Class timetable slot added");
+}
+function scheduleQuizSlot(){
+  const qIdx=+$("#tq_sel").value, day=$("#tq_day").value, time=$("#tq_time").value.trim()||"10:00";
+  if(isNaN(qIdx)||!S.quizzes[qIdx])return toast("Select a quiz to schedule");
+  S.quizzes[qIdx].day=day;
+  S.quizzes[qIdx].time=time;
+  R();toast(`Scheduled "${S.quizzes[qIdx].t}" for ${day} at ${time}`);
+}
+function createAttendanceSession(){
+  const c=+$("#att_u").value, date=$("#att_label").value.trim()||`Session ${fd(new Date())}`;
+  const records={};S.units[c].students.forEach(st=>records[st]="Present");
+  S.attendance.unshift({c,date,records});R();toast("Attendance roll call started");
+}
+
+function stageQuestion(){
+  const q=$("#qq").value.trim();
+  const opts=[$("#qo0").value.trim(),$("#qo1").value.trim(),$("#qo2").value.trim(),$("#qo3").value.trim()].filter(Boolean);
+  const cor=+$("#qcor").value, exp=$("#qexp").value.trim();
+  if(!q||opts.length<2)return toast("Enter a question and at least 2 options");
+  if(cor>=opts.length)return toast("Selected correct option is empty");
+  S.qDraft.push({q,o:opts,a:cor,exp});
+  const keepTitle=$("#qt").value, keepTopic=$("#qtopic").value, keepDay=$("#qday").value, keepTime=$("#qtime").value, keepMins=$("#qmins").value, keepAtt=$("#qatt").value, keepPass=$("#qpass").value;
+  R();
+  $("#qt").value=keepTitle;$("#qtopic").value=keepTopic;$("#qday").value=keepDay;$("#qtime").value=keepTime;$("#qmins").value=keepMins;$("#qatt").value=keepAtt;$("#qpass").value=keepPass;
+  toast(`Question ${S.qDraft.length} added to quiz`);
+}
+function publishQuiz(i){
+  const t=$("#qt").value.trim(), topicId=$("#qtopic").value||null, day=$("#qday").value, time=$("#qtime").value.trim()||"10:00", mins=Math.max(1,+$("#qmins").value||10), maxAtt=+$("#qatt").value||0, pass=Math.min(100,Math.max(1,+$("#qpass").value||50));
+  if(!t)return toast("Enter a quiz title");
+  if(!S.qDraft.length)return toast("Add at least one question before publishing");
+  S.quizzes.push({c:i,topicId,day,time,t,mins,maxAtt,pass,qs:[...S.qDraft],attempts:{}});
+  S.qDraft=[];R();toast("Quiz published & added to weekly timetable");
+}
+function deleteQuiz(k){S.quizzes.splice(k,1);R();toast("Quiz deleted")}
+
+function startQuiz(k){
+  stopQuizTimer();
+  const q=S.quizzes[k];
+  S.qi=k;S.qs={i:0,ans:[],fin:false,rem:(q.mins||10)*60,timedOut:false,tid:null,startedAt:Date.now()};
+  S.qs.tid=setInterval(()=>{
+    if(!S.user||S.qi===null||S.qs.fin){stopQuizTimer();return}
+    S.qs.rem--;
+    const el=$("#qtimer");
+    if(el){el.textContent="⏱ "+fmtSec(Math.max(0,S.qs.rem));if(S.qs.rem<=60)el.classList.add("urgent")}
+    if(S.qs.rem<=0)finishQuiz(true);
+  },1000);
+  R();
+}
+function ans(j){const s=S.qs, q=S.quizzes[S.qi];s.ans.push(j);if(++s.i>=q.qs.length)finishQuiz(false);else R()}
+function finishQuiz(timedOut){
+  stopQuizTimer();
+  const s=S.qs, q=S.quizzes[S.qi];
+  s.fin=true;s.timedOut=timedOut;
+  const elapsedSec=Math.max(1,Math.round((Date.now()-(s.startedAt||Date.now()))/1000));
+  const n=q.qs.filter((x,j)=>s.ans[j]===x.a).length;
+  const score=Math.round(n/q.qs.length*100);
+  q.attempts=q.attempts||{};
+  q.attempts[S.user.name]=q.attempts[S.user.name]||[];
+  q.attempts[S.user.name].push({score,ans:[...s.ans],timedOut});
+  if(!timedOut && elapsedSec < q.qs.length * 4){
+    S.integrityFlags.unshift({
+      id:"INT-"+(105+S.integrityFlags.length),
+      student:S.user.name,
+      unit:S.units[q.c]?.code||"UNIT",
+      type:"Quiz Speed Anomaly",
+      detail:`Completed "${q.t}" (${q.qs.length} questions) in ${elapsedSec}s.`,
+      severity:"Medium",
+      status:"Flagged",
+      date:"Just now"
+    });
+  }
+  R();
+  if(timedOut)toast("Time's up! Quiz auto-submitted.");
+}
+function reviewLastQuiz(k){
+  stopQuizTimer();
+  const q=S.quizzes[k], list=q.attempts?.[S.user.name]||[];
+  if(!list.length)return;
+  const last=list[list.length-1];
+  S.qi=k;S.qs={i:q.qs.length,ans:last.ans,fin:true,rem:0,timedOut:last.timedOut,tid:null,startedAt:0};
+  R();
+}
+
+function addAsg(i){
+  const t=$("#at").value.trim(),d=$("#ad").value;
+  if(!t||!d)return toast("Enter a title and due date");
+  S.tasks.push({t,c:i,d:Math.max(0,Math.ceil((new Date(d)-new Date())/864e5)),w:+$("#aw").value||5,h:Math.max(1,+$("#ah").value||3),logged:{},done:0,a:1,subs:{}});
+  S.units[i].students.forEach(st=>pushNotif(st,`New assignment "${t}" posted in ${S.units[i].code}.`));
+  R();toast("Assignment created; students notified");
+}
+function submitA(k){
+  const fileEl=$("#ffile"+k), typed=$("#f"+k).value.trim();
+  const f=fileEl?.files?.[0];
+  if(!f && !typed)return toast("Choose a file or enter a file name");
+  let blobKey=null, fileName=typed;
+  if(f){
+    blobKey="sub_"+Date.now();
+    FILE_BLOBS[blobKey]={url:URL.createObjectURL(f),type:f.type||"application/octet-stream",name:f.name};
+    fileName=f.name;
+  }
+  const t=S.tasks[k];
+  t.subs=t.subs||{};
+  t.subs[S.user.name]={file:fileName,blobKey,mark:null,fb:"",status:"Submitted",note:`Submitted by ${S.user.name}.`};
+  const ins=S.units[t.c]?.ins;
+  if(ins)pushNotif(ins,`${S.user.name} submitted ${fileName} for "${t.t}".`);
+  if(S.plan)computePlan(true);else R();
+  toast("Assignment submitted to instructor");
+}
+function saveGrade(k,stName,idx,status){
+  const raw=$("#mk_"+k+"_"+idx).value, fb=$("#fb_"+k+"_"+idx).value.trim();
+  if(raw===""||isNaN(+raw)||+raw<0||+raw>100)return toast("Enter a valid score between 0 and 100");
+  const mark=Math.round(+raw);
+  Object.assign(S.tasks[k].subs[stName],{mark,fb,status});
+  if(status==="Released")pushNotif(stName,`${S.user.name} released your grade (${mark}%) for "${S.tasks[k].t}".`);
+  R();toast(status==="Released"?`Grade released to ${stName}`:`Draft grade saved for ${stName}`);
+}
+function releaseGrades(k){
+  const subs=S.tasks[k].subs||{};
+  Object.entries(subs).forEach(([stName,s])=>{
+    if(s.status==="Draft"&&s.mark!==null){
+      s.status="Released";
+      pushNotif(stName,`${S.user.name} released your grade (${s.mark}%) for "${S.tasks[k].t}".`);
+    }
+  });
+  R();toast("All graded marks released to students");
+}
+
+function addUnit(){
+  const code=$("#ucode").value.trim().toUpperCase(),name=$("#uname").value.trim(),ins=$("#uins").value;
+  if(!code||!name)return toast("Enter both a unit code and title");
+  if(S.units.some(u=>u.code.toUpperCase()===code))return toast("A unit with that code already exists");
+  S.units.push({code,name,ins,students:[]});R();toast(`${code} created and assigned to ${ins}`);
+}
+function assignInstructor(unitIdx,insName){S.units[unitIdx].ins=insName;R();toast(`Assigned ${insName} to ${S.units[unitIdx].code}`)}
+function enrollStudent(unitIdx,studentName){const u=S.units[unitIdx];if(!u||u.students.includes(studentName))return;u.students.push(studentName);R();toast(`${studentName} enrolled in ${u.code}`)}
+function unenrollStudent(unitIdx,studentName){const u=S.units[unitIdx];u.students=u.students.filter(s=>s!==studentName);R();toast(`Removed ${studentName} from ${u.code}`)}
+function deleteUnit(unitIdx){
+  const code=S.units[unitIdx].code;S.units.splice(unitIdx,1);
+  [S.res,S.tasks,S.quizzes,S.th,S.msgs,S.timetable,S.flashcards,S.attendance,S.groups,S.topics].forEach(arr=>{
+    for(let k=arr.length-1;k>=0;k--){if(arr[k].c===unitIdx)arr.splice(k,1);else if(arr[k].c>unitIdx)arr[k].c--}
+  });
+  R();toast(`Deleted unit ${code}`);
+}
+function adminAddUser(){
+  const n=$("#un").value.trim(),r=$("#ur").value;
+  const e=($("#ue").value.trim()||(n.toLowerCase().replace(/\s+/g,".")+"@university.ac.ke")).toLowerCase();
+  if(!n)return toast("Enter the user's full name");
+  if(S.acc.some(a=>a.e===e))return toast("An account with this email already exists");
+  S.acc.push({e,p:r.toLowerCase()+"123",n,r,year:1,lastLoginDays:0,feeStatus:"Cleared"});R();toast(`Added ${n} (${r}) — default password: ${r.toLowerCase()}123`);
+}
+
+function addTask(){
+  const t=$("#nt").value.trim(),d=$("#nd").value;
+  if(!t||!d)return toast("Enter a task and due date");
+  const days=Math.ceil((new Date(d+"T23:59:59")-new Date())/864e5);
+  S.tasks.push({t,c:+$("#nc").value,d:days,w:+$("#nw").value||5,h:Math.max(1,+$("#nh").value||3),logged:{},done:0});
+  if(S.plan)computePlan(true);else R();
+  toast("Task added & synced with Study Planner");
+}
+function newTh(i){
+  const t=$("#dt").value.trim();
+  const topicId=$("#dtopic")?.value||null;
+  if(!t)return toast("Enter a title");
+  S.th.unshift({t,c:i,topicId,by:S.user.name,ans:0,p:[[S.user.name,t]]});R();toast("Discussion posted");
+}
+function replyThread(o){
+  const txt=$("#rp").value.trim();
+  if(!txt)return toast("Write a reply first");
+  const th=S.th[o];th.p.push([S.user.name,txt]);
+  if(th.by!==S.user.name)pushNotif(th.by,`${S.user.name} replied to "${th.t}".`);
+  R();toast("Reply posted; participants notified");
+}
+function postMessage(){
+  const txt=$("#mt").value.trim(), c=+$("#mu").value;
+  if(!txt)return toast("Write a message first");
+  S.msgs.unshift({f:S.user.name,t:txt,c});
+  if(S.role==="Instructor")S.units[c].students.forEach(st=>pushNotif(st,`${S.user.name} posted an announcement in ${S.units[c].code}.`));
+  else pushNotif(S.units[c].ins,`${S.user.name} sent a message in ${S.units[c].code}.`);
+  R();toast(S.role==="Student"?"Message sent":"Students notified");
+}
+
+function renderSearchOverlay(){
+  const q=S.search.trim().toLowerCase();
+  if(!q)return "";
+  const mine=myUnitIndices();
+  const topicHits=S.topics.filter(tp=>mine.includes(tp.c)&&tp.title.toLowerCase().includes(q));
+  const resHits=S.res.filter(r=>mine.includes(r.c)&&(r.t.toLowerCase().includes(q)||r.k.toLowerCase().includes(q)));
+  const taskHits=S.tasks.filter(t=>mine.includes(t.c)&&t.t.toLowerCase().includes(q));
+  const discHits=S.th.map((t,idx)=>({t,idx})).filter(({t})=>mine.includes(t.c)&&t.t.toLowerCase().includes(q));
+  return `<div class="pop" style="left:16px;right:auto;width:min(460px,calc(100vw - 32px))">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><b>Search results for "${esc(S.search)}"</b><button class="ghost sm" onclick="S.search='';R()">Close</button></div>
+    ${!topicHits.length&&!resHits.length&&!taskHits.length&&!discHits.length?`<small>No matching topics, resources, tasks, or discussions found.</small>`:""}
+    ${topicHits.map(tp=>`<div class="item"><div><b>Week ${tp.week}: ${esc(tp.title)}</b><br><small>${esc(U(tp.c))} · Weekly Topic</small></div><button class="ghost sm" onclick="S.search='';S.view='res';openU(${tp.c},'modules');S.weekFilter='${tp.week}';R()">Open</button></div>`).join("")}
+    ${resHits.map(r=>`<div class="item"><div><b>${esc(r.t)}</b><br><small>${esc(U(r.c))} · ${esc(topicLabel(r.topicId))}</small></div><button class="ghost sm" onclick="S.search='';S.view='res';openU(${r.c},'books','${esc(r.topicId||"All")}');S.resCat='${esc(r.k)}';R()">Open</button></div>`).join("")}
+    ${taskHits.map(t=>`<div class="item"><div><b>${esc(t.t)}</b><br><small>${esc(U(t.c))} · Task</small></div><button class="ghost sm" onclick="S.search='';S.view='${t.a?"res":"tasks"}';${t.a?`openU(${t.c},'assign')`:"R()"};">Go</button></div>`).join("")}
+    ${discHits.map(({t,idx})=>`<div class="item"><div><b>${esc(t.t)}</b><br><small>${esc(U(t.c))} · ${esc(topicLabel(t.topicId))}</small></div><button class="ghost sm" onclick="S.search='';S.view='disc';openU(${t.c},'disc');S.ot=${idx};R()">View</button></div>`).join("")}
+  </div>`;
+}
+
+function renderNotifsPopover(){
+  if(!S.showNotifs)return "";
+  const list=myNotifs();
+  return `<div class="pop">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px">
+      <b>Notifications (${list.filter(n=>!n.read).length} unread)</b>
+      <button class="ghost sm" onclick="myNotifs().forEach(n=>n.read=true);R()">Mark all read</button>
+    </div>
+    ${list.map(n=>`<div class="item" style="opacity:${n.read?.65:1}"><div>${esc(n.text)}<br><small>${esc(n.time)}</small></div>${!n.read?`<span class="tag">New</span>`:""}</div>`).join("")||"<small>No notifications yet.</small>"}
+  </div>`;
+}
+
+function renderPreviewModal(){
+  const p=S.preview;
+  if(!p)return "";
+  const isImg=p.mime.startsWith("image/");
+  const isPdf=p.mime==="application/pdf"||p.fileName.toLowerCase().endsWith(".pdf");
+  return `<div class="modal-bg" onclick="if(event.target===this){S.preview=null;R()}">
+    <div class="modal">
+      <div class="row" style="justify-content:space-between">
+        <div><b style="font-size:18px">${esc(p.title)}</b><br><small>${esc(p.unitLabel||"")} · File: ${esc(p.fileName)}</small></div>
+        <div class="row" style="margin:0">
+          <button class="sm" onclick="downloadPreviewFile()">Download</button>
+          <button class="ghost sm" onclick="S.preview=null;R()">Close</button>
+        </div>
+      </div>
+      ${p.blobUrl && isImg?`<img src="${p.blobUrl}" style="max-width:100%;border-radius:8px;margin-top:8px">`:
+        p.blobUrl && isPdf?`<iframe src="${p.blobUrl}" style="width:100%;height:420px;border:1px solid var(--line);border-radius:8px;margin-top:8px"></iframe>`:
+        `<div class="fb" style="margin-top:10px;padding:14px"><b>Document Preview (${esc(p.fileName)})</b><p style="margin:8px 0 0">${esc(p.summary)}</p></div>`}
+    </div>
+  </div>`;
+}
+
+function authView(){const l=S.mode=="login";return `<div class="auth"><div class="logo">🎓</div><h1>University StudyHub</h1><small style="display:block;text-align:center">Study resources and academic planning in one place</small><div style="text-align:center;margin-top:8px"><span class="obj"> Accounts and role-based access</span></div><div class="tabs"><button class="${l?"":"ghost"}" onclick="setMode('login')">Log in</button><button class="${l?"ghost":""}" onclick="setMode('signup')">Sign up</button></div><div class="card">`+(l?`<label class="fld"><span>Email</span><input id="e" type="email" placeholder="you@university.ac.ke" autocomplete="username"></label><label class="fld"><span>Password</span><input id="p" type="password" autocomplete="current-password"></label><div class="err">${esc(S.err)}</div><button style="width:100%" onclick="doLogin()">Log in</button><p><button class="link" onclick="toast('A reset link would be emailed to you')">Forgot password?</button></p><small></small><div class="demo"><button class="ghost" onclick="fill('student@university.ac.ke','student123')">Student (Tonny)</button><button class="ghost" onclick="fill('instructor@university.ac.ke','instructor123')">Instructor (Grace)</button><button class="ghost" onclick="fill('admin@university.ac.ke','admin123')">Administrator</button></div>`:`<label class="fld"><span>Full name</span><input id="n" autocomplete="name"></label><label class="fld"><span>Email</span><input id="e" type="email" placeholder="you@university.ac.ke" autocomplete="username"></label><label class="fld"><span>I am a</span><select id="r"><option>Student</option><option>Instructor</option></select></label><label class="fld"><span>Password (6+ characters)</span><input id="p" type="password" autocomplete="new-password"></label><label class="fld"><span>Confirm password</span><input id="p2" type="password" autocomplete="new-password"></label><div class="err">${esc(S.err)}</div><button style="width:100%" onclick="doSignup()">Create account</button>`)+`</div></div><div id="toast"></div>`}
+const setMode=m=>{S.mode=m;S.err="";R()},fill=(e,p)=>{S.mode="login";S.err="";R();$("#e").value=e;$("#p").value=p};
+function err(m){const v={e:$("#e").value,n:$("#n")?$("#n").value:"",r:$("#r")?$("#r").value:""};S.err=m;R();["e","n","r"].forEach(k=>{if(v[k]&&$("#"+k))$("#"+k).value=v[k]})}
+function start(a){stopQuizTimer();stopPomo();a.lastLoginDays=0;S.user={name:a.n,email:a.e};S.role=a.r;S.view="dash";S.unit=null;S.resCat="All";S.topicFilter="All";S.weekFilter="All";S.ot=null;S.qi=null;S.gradeAsg=null;S.qDraft=[];S.showNotifs=false;S.search="";S.err="";R();toast("Welcome, "+a.n.split(" ")[0])}
+function doLogin(){const e=$("#e").value.trim().toLowerCase(),p=$("#p").value;if(!e||!p)return err("Enter your email and password.");const a=S.acc.find(x=>x.e==e&&x.p==p);if(!a)return err("Incorrect email or password.");start(a)}
+function doSignup(){const n=$("#n").value.trim(),e=$("#e").value.trim().toLowerCase(),p=$("#p").value,p2=$("#p2").value,r=$("#r").value;let m="";if(!n||!e||!p)m="Fill in all fields.";else if(!/^\S+@\S+\.\S+$/.test(e))m="Enter a valid email address.";else if(S.acc.some(x=>x.e==e))m="An account with this email already exists.";else if(p.length<6)m="Password must be at least 6 characters.";else if(p!=p2)m="Passwords do not match.";if(m)return err(m);const a={e,p,n,r,year:1,lastLoginDays:0,feeStatus:"Cleared"};S.acc.push(a);start(a)}
+function logout(){stopQuizTimer();stopPomo();S.user=null;S.mode="login";S.err="";R();toast("You have been logged out")}
+
+function R(){
+  saveState();
+  if(!S.user){$("#app").innerHTML=authView();return}
+  const unread=myNotifs().filter(n=>!n.read).length;
+  const activeId=document.activeElement?.id;
+  const selStart=document.activeElement?.selectionStart;
+
+  $("#app").innerHTML=`<header>
+    <b>🎓 University StudyHub</b>
+    <input id="gsearch" class="gsearch" value="${esc(S.search)}" placeholder="Search topics, slides, quizzes..." oninput="S.search=this.value;R()">
+    <span class="sp"></span>
+    <span>${esc(S.user.name)} · ${esc(S.role)}</span>
+    <button onclick="S.showNotifs=!S.showNotifs;R()" title="Notifications">🔔${unread?`<span class="badge">${unread}</span>`:""}</button>
+    <button onclick="toggleTheme()" title="Toggle Light / Dark theme">🌓</button>
+    <button onclick="resetDemo()" title="Restore default sample data">Reset</button>
+    <button onclick="logout()">Log out</button>
+  </header>
+  ${renderSearchOverlay()}
+  ${renderNotifsPopover()}
+  ${renderPreviewModal()}
+  <div class="app">
+    <nav>${NAV[S.role].map(([k,l])=>`<a class="${k==S.view?"on":""}" onclick="stopQuizTimer();S.view='${k}';S.unit=null;S.resCat='All';S.topicFilter='All';S.weekFilter='All';S.ot=null;S.qi=null;S.gradeAsg=null;S.showNotifs=false;R()">${l}</a>`).join("")}</nav>
+    <main>${V[S.view]()}<p><small> Click Reset to restore default data.</small></p></main>
+  </div>
+  <div id="toast"></div>`;
+
+  if(activeId==="gsearch" && $("#gsearch")){
+    const el=$("#gsearch");
+    el.focus();
+    if(typeof selStart==="number")el.setSelectionRange(selStart,selStart);
+  }
+}
+R();
+</script></body></html>
